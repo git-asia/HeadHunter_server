@@ -1,6 +1,7 @@
 import express, {json} from "express";
 // import cors from 'cors';
 import 'express-async-errors';
+import {userRouter} from "./routers/user";
 
 const app = express();
 
@@ -8,6 +9,8 @@ const app = express();
 //     origin: 'http://localhost:3000,' }));
 app.use(json());
 
-app.listen(3001,'0.0.0.0', () =>{
+app.use("/user", userRouter);
+
+app.listen(3001, '0.0.0.0', () => {
     console.log('Listening on http://localhost:3001');
 });
