@@ -1,6 +1,7 @@
 import {Request, Response, Router} from "express";
 import {UserRecord} from "../records/user-record";
 import {ValidationError} from "../utils/errors";
+import {hash} from "bcrypt";
 
 export const userRouter = Router();
 
@@ -20,7 +21,7 @@ userRouter
         if (pass !== pass2) {
             throw new ValidationError('Hasła są różne');
         }
-        user.pass = pass;
+        user.pass = await hash(pass, 10);
         await user.updatePassword();
         res.json(user);
     });
