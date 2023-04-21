@@ -6,8 +6,8 @@ import { ValidationError } from "../utils/errors";
 
 
 export const userRouter = Router()
-  .post("/login/:mail/:password", async (req: Request, res: Response) => {
-    const params= {...req.params,id: '',salt: '',} as UserEntity;
+  .post("/login", async (req: Request, res: Response) => {
+    const params= {...req.body,id: '',salt: '',} as UserEntity;
     const newParams = new UserRecord(params);
 
      if(await checkPassword(newParams)){
