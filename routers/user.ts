@@ -15,8 +15,14 @@ userRouter
     .patch("/newpass", async (req: Request, res: Response) => {
         const {id, pass, pass2} = req.body;
         const user: UserRecord | null = await UserRecord.getOneUser(id);
+
+        const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
+
         if (user === null) {
             throw new ValidationError('Nie ma takiego ID');
+        }
+        if (!passwordRegex.test(pass)) {
+            throw new ValidationError('Hasło musi mieć co najmniej 8 znaków, składać się z dużych i małych liter, cyfr i znaków specjalnych');
         }
         if (pass !== pass2) {
             throw new ValidationError('Hasła są różne');
