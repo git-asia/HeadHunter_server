@@ -5,7 +5,7 @@ import {FieldPacket} from "mysql2";
 import { pool } from "../config/db";
 
 
-type AdRecordResults = [UserEntity[], FieldPacket[]];
+type UserRecordResults = [UserEntity[], FieldPacket[]];
 
 export class UserRecord implements  UserEntity{
 
@@ -38,7 +38,7 @@ export class UserRecord implements  UserEntity{
     }
 
     static async getOne(mail: string):Promise<UserEntity| null> {
-      const [results] =await pool.execute("SELECT * FROM `users` WHERE mail=:mail", { mail }) as AdRecordResults;
+      const [results] =await pool.execute("SELECT * FROM `users` WHERE mail=:mail", { mail }) as UserRecordResults;
       return results.length === 0 ? null : new UserRecord(results[0] as UserEntity)
 
     }
