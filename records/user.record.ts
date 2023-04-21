@@ -3,6 +3,7 @@ import {ValidationError} from "../utils/errors";
 
 import {FieldPacket} from "mysql2";
 import { pool } from "../config/db";
+import bcrypt from "bcrypt";
 
 
 type UserRecordResults = [UserEntity[], FieldPacket[]];
@@ -30,6 +31,20 @@ export class UserRecord implements  UserEntity{
     this.salt = obj.salt;
 
   }
+
+    async hashPassword(password: string, salt: string): Promise<string>{
+      try {
+        return await bcrypt.hash(password, salt);
+      } catch (err) {
+        throw new ValidationError("Coś poszło nie tak");
+      }
+    }
+
+    async newHashPassword(password:string){
+      const salt = bcrypt.genSaltSync(10);
+      const hash = await this.hashPassword(password, salt)
+      return {password: hash, salt: salt}
+    }
 
 
     checkPasswordStrength(){
