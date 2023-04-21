@@ -2,14 +2,12 @@ import { UserEntity } from "../types";
 import {ValidationError} from "../utils/errors";
 
 import {FieldPacket} from "mysql2";
-import {v4 as uuid} from 'uuid';
-
-
+import { pool } from "../config/db";
 
 
 type AdRecordResults = [UserEntity[], FieldPacket[]];
 
-export class userRecord implements  UserEntity{
+export class UserRecord implements  UserEntity{
 
   id: string;
   mail: string;
@@ -25,12 +23,23 @@ export class userRecord implements  UserEntity{
       throw new ValidationError("To nie jest prawidłowy adres e-mail");
     }
 
+
     this.id = obj.id
     this.mail = obj.mail
     this.password = obj.password;
-    this.salt = obj.password;
-      }
+    this.salt = obj.salt;
+
+  }
 
 
+    checkPasswordStrength(){
+      const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/; // cyfra/mała litera/duża litera/znakspecjalny/min 8 znaków
+      return passwordRegex.test(this.password);
+    }
 
+    static async getOne(mail: string):Promise<UserEntity| null> {
+      const [results] =await pool.execute("SELECT * FROM `users` WHERE mail=:mail", { mail }) as AdRecordResults;
+      return results.length === 0 ? null : new UserRecord(results[0] as UserEntity)
+
+    }
 }
