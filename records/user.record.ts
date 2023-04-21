@@ -17,6 +17,14 @@ export class userRecord implements  UserEntity{
   salt: string;
 
   constructor(obj: UserEntity) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!obj.mail) {
+      throw new ValidationError("Adres e-mail jest wymagany");
+    }else if (!regex.test(obj.mail)  || obj.mail.length < 5) {
+      throw new ValidationError("To nie jest prawidłowy adres e-mail");
+    }
+
     this.id = obj.id
     this.mail = obj.mail
     this.password = obj.password;
