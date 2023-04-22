@@ -4,4 +4,5 @@ export interface UserEntity {
     email: string;
     pass: string;
     token: string;
+    expirationDate: Date;
 }

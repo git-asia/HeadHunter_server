@@ -12,6 +12,15 @@ userRouter
         res.json(userId);
     })
 
+    .get("/email/:email", async (req: Request, res: Response) => {
+        const userId: string | null = await UserRecord.checkEmail(req.params.email);
+        if (userId === null) {
+            throw new ValidationError('Nie ma takiego adresu e-mail');
+        }
+        await UserRecord.addToken(userId);
+        res.json(req.params.email);
+    })
+
     .patch("/newpass", async (req: Request, res: Response) => {
         const {id, pass, pass2} = req.body;
         const user: UserRecord | null = await UserRecord.getOneUser(id);

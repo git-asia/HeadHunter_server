@@ -2,6 +2,7 @@ import {FieldPacket} from "mysql2";
 import {UserEntity} from "../types/user.entity";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../config/db-sample";
+import {v4 as uuid} from "uuid";
 
 type UserRecordResult = [UserRecord[], FieldPacket[]];
 
@@ -11,6 +12,8 @@ export class UserRecord implements UserEntity {
     public email: string;
     public pass: string;
     public token: string;
+    public expirationDate: Date;
+
 
     constructor(obj: UserEntity) {
         if (!obj.name || obj.name.length < 3 || obj.name.length > 50) {
@@ -27,6 +30,7 @@ export class UserRecord implements UserEntity {
         this.email = obj.email;
         this.pass = obj.pass;
         this.token = obj.token;
+        this.expirationDate = obj.expirationDate;
     }
 
     static async checkToken(token: string): Promise<string | null> {
@@ -37,6 +41,20 @@ export class UserRecord implements UserEntity {
         return results.length === 0 ? null : results[0].id;
     }
 
+    static async checkEmail(email: string): Promise<string | null> {
+        const [results] = (await pool.execute("SELECT `id` FROM `users` WHERE `email` = :email", {
+            email,
+        })) as UserRecordResult;
+        return results.length === 0 ? null : results[0].id;
+    }
+
+    static async addToken(id: string): Promise<void> {
+        await pool.execute("UPDATE `users` SET `token` = :token, `expirationDate` = ADDDATE(NOW(), INTERVAL 1 DAY) WHERE `id` = :id", {
+            id,
+            token: uuid(),
+        });
+    }
+
     static async getOneUser(id: string): Promise<UserRecord | null> {
         const [results] = (await pool.execute("SELECT * FROM `users` WHERE `id` = :id", {
             id,
@@ -45,9 +63,10 @@ export class UserRecord implements UserEntity {
     }
 
     async updatePassword(): Promise<void> {
-        await pool.execute("UPDATE `users` SET `pass` = :pass WHERE `id` = :id", {
+        await pool.execute("UPDATE `users` SET `pass` = :pass, `expirationDate` = ADDDATE(NOW(), INTERVAL 1 DAY) WHERE `id` = :id", {
             pass: this.pass,
             id: this.id,
         });
     }
+
 }
