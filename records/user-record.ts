@@ -34,11 +34,13 @@ export class UserRecord implements UserEntity {
     }
 
     static async checkToken(token: string): Promise<string | null> {
-        const [results] = (await pool.execute("SELECT `id` FROM `users` WHERE `token` = :token", {
+        const [results] = (await pool.execute("SELECT `id`, `expirationDate` FROM `users` WHERE `token` = :token", {
             token,
         })) as UserRecordResult;
-        console.log(results);
-        return results.length === 0 ? null : results[0].id;
+        if (results.length === 0) {
+            throw new ValidationError('Nie ma takiego tokena');
+        }
+        return (results[0].expirationDate).getTime() < Date.now() ? null : results[0].id;
     }
 
     static async checkEmail(email: string): Promise<string | null> {
@@ -63,7 +65,7 @@ export class UserRecord implements UserEntity {
     }
 
     async updatePassword(): Promise<void> {
-        await pool.execute("UPDATE `users` SET `pass` = :pass, `expirationDate` = ADDDATE(NOW(), INTERVAL 1 DAY) WHERE `id` = :id", {
+        await pool.execute("UPDATE `users` SET `pass` = :pass, `token` = NULL, `expirationDate` = NULL WHERE `id` = :id", {
             pass: this.pass,
             id: this.id,
         });
