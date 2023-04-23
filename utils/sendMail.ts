@@ -1,26 +1,34 @@
 import nodemailer from "nodemailer";
 import { ValidationError } from "./errors";
-import { SentMessageInfo } from "nodemailer/lib/smtp-transport";
 import { smtpConfig } from "../config/smtp";
 
-export const sendMail =async (mail:string,subject:string, text:string, html:string):Promise<SentMessageInfo> =>{
+
+export const sendMail = (mail:string,subject:string, text:string, html:string) =>{
 
 
   const transporter = nodemailer.createTransport(smtpConfig);
-
-  const send = await transporter.sendMail({
-    from: '"Fred Foo 👻" <foo@example.com>',
+  const data = {
+    from: '"No Reply" <headhunter@testHeadHunter.oi>',
     to: mail,
     subject: subject,
     text: text,
     html: html,
-  });
-  console.log(send);
-  return send;
+  };
 
-  // process.on('uncaughtException', (err) => {
-  //   console.log('Nieobsłużony wyjątek: ', err);
-  // });
+  transporter.sendMail(data).then((result)=>{
+    console.log('Wiadomość została wysłana');
+    return result;
+  }).catch((err)=>{
+    console.log(err);
+    throw new ValidationError('Mail nie został wysłany');
+  })
+
+
+  process.on('uncaughtException', (err) => {
+     console.log('Nieobsłużony wyjątek: ', err);
+   });
 
 
 }
+
+
