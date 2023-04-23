@@ -10,13 +10,11 @@ export const userRouter = Router()
     const params= {...req.body,id: '',salt: '',} as UserEntity;
     const newParams = new UserRecord(params);
 
-     if(await checkPassword(newParams)){
+     if(await newParams.checkPassword()){
          console.log('Dane logowania są prawidłowe');
          //TODO: miejsce na ustawienie tokena passport
      }else{
          throw new ValidationError("Błędne hasło")
      }
-
-
 
   });
