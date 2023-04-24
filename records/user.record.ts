@@ -69,13 +69,6 @@ export class UserRecord implements UserEntity {
         });
     }
 
-    static async getOneUser(id: string): Promise<UserRecord | null> {
-        const [results] = (await pool.execute("SELECT * FROM `users` WHERE `userId` = :id", {
-            id,
-        })) as UserRecordResult;
-        return results.length === 0 ? null : new UserRecord(results[0]);
-    }
-
     static async updatePassword(id: string, hashPassword: string): Promise<void> {
         await pool.execute("UPDATE `users` SET `password` = :hashPassword WHERE `userId` = :id", {
             hashPassword,
