@@ -15,18 +15,15 @@ export const sendMail = (mail:string,subject:string, text:string, html:string) =
     html: html,
   };
 
-  transporter.sendMail(data).then((result)=>{
+  return transporter.sendMail(data)
+    .then((result)=>{
     console.log('Wiadomość została wysłana');
     return result;
-  }).catch((err)=>{
+   })
+    .catch((err)=>{
     console.log(err);
-    throw new ValidationError('Mail nie został wysłany');
+    throw new ValidationError('E-mail nie został wysłany');
   })
-
-
-  process.on('uncaughtException', (err) => {
-     console.log('Nieobsłużony wyjątek: ', err);
-   });
 
 
 }
