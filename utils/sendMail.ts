@@ -1,9 +1,10 @@
 import nodemailer from "nodemailer";
 import { ValidationError } from "./errors";
 import { smtpConfig } from "../config/smtp";
-import 'express-async-errors';
 
-export const sendMail = async (mail:string,subject:string, text:string, html:string) =>{
+
+export const sendMail = (mail:string,subject:string, text:string, html:string) =>{
+
 
   const transporter = nodemailer.createTransport(smtpConfig);
   const data = {
@@ -14,7 +15,8 @@ export const sendMail = async (mail:string,subject:string, text:string, html:str
     html: html,
   };
 
-  return transporter.sendMail(data).then((result)=>{
+  return transporter.sendMail(data)
+    .then((result)=>{
     console.log('Wiadomość została wysłana');
     return result;
    })
@@ -22,6 +24,7 @@ export const sendMail = async (mail:string,subject:string, text:string, html:str
     console.log(err);
     throw new ValidationError('E-mail nie został wysłany');
   })
+
 
 }
 
