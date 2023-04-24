@@ -51,9 +51,17 @@ export class UserRecord implements UserEntity {
     }
 
     static async addToken(id: string): Promise<void> {
+        let newToken, isThisToken;
+        do {
+            newToken = uuid();
+            const [results] = await pool.execute("SELECT `id` FROM `users` WHERE `token` = :token", {
+                token: newToken,
+            }) as UserRecordResult;
+            isThisToken = results.length;
+        } while (isThisToken > 0)
         await pool.execute("UPDATE `users` SET `token` = :token, `expirationDate` = ADDDATE(NOW(), INTERVAL 1 DAY) WHERE `id` = :id", {
             id,
-            token: uuid(),
+            token: newToken,
         });
     }
 
