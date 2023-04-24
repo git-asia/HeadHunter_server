@@ -1,13 +1,12 @@
 import {Request, Response, Router} from "express";
 import { UserRecord } from "../records/user.record";
 import { UserEntity } from "../types";
-import { checkPassword } from "../utils/checkPassword";
 import { ValidationError } from "../utils/errors";
 
 
 export const userRouter = Router()
   .post("/login", async (req: Request, res: Response) => {
-    const params= {...req.body,id: '',salt: '',} as UserEntity;
+    const params= {...req.body,id: '',} as UserEntity;
     const newParams = new UserRecord(params);
 
      if(await newParams.checkPassword()){
