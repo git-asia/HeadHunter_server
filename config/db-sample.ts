@@ -8,7 +8,7 @@ export const pool = createPool({
     /** Database password */
     password: '',
     /** Database name */
-    database: 'megak_hh',
+    database: 'megak_project',
     namedPlaceholders: true,
     decimalNumbers: true,
 })
