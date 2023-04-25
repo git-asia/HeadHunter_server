@@ -1,11 +1,12 @@
 import express, {json} from "express";
 // import cors from 'cors';
 import 'express-async-errors';
-import { userRouter } from "./routers/user";
-import { studentRouter } from "./routers/student";
-import { authRouter } from "./routers/auth";
-import { adminRouter } from "./routers/admin";
-import { homeRouter } from "./routers/home";
+import { adminRouter } from "./routers/admin.router";
+import { authRouter } from "./routers/auth.router";
+import { homeRouter } from "./routers/home.router";
+import { studentRouter } from "./routers/student.router";
+import { userRouter } from "./routers/user.router";
+
 
 const app = express();
 
