@@ -1,7 +1,7 @@
 import express, {json} from "express";
 // import cors from 'cors';
 import 'express-async-errors';
-import {userRouter} from "./routers/user";
+import {userRouter} from "./routers/user.router";
 import {handleError} from "./utils/errors";
 
 const app = express();

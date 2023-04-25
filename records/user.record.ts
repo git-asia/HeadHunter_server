@@ -1,9 +1,8 @@
 import {FieldPacket} from "mysql2";
-import {UserEntity} from "../types/user.entity";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../config/db-sample";
 import {v4 as uuid} from "uuid";
-import {RegistrationTokenEntity} from "../types/registration-token.entity";
+import {RegistrationTokenEntity, UserEntity} from "../types";
 
 type UserRecordResult = [UserRecord[], FieldPacket[]];
 type RegistrationTokenResult = [RegistrationTokenEntity[], FieldPacket[]];
