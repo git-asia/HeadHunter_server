@@ -11,22 +11,22 @@ type UserRecordResults = [UserEntity[], FieldPacket[]];
 export class UserRecord implements  UserEntity {
 
   id: string;
-  mail: string;
+  email: string;
   password: string;
 
 
   constructor(obj: UserEntity) {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!obj.mail) {
+    if (!obj.email) {
       throw new ValidationError("Adres e-mail jest wymagany");
-    } else if (!regex.test(obj.mail) || obj.mail.length < 5) {
+    } else if (!regex.test(obj.email) || obj.mail.length < 5) {
       throw new ValidationError("To nie jest prawidłowy adres e-mail");
     }
 
 
     this.id = obj.id
-    this.mail = obj.mail
+    this.email = obj.email
     this.password = obj.password;
 
   }
@@ -51,15 +51,15 @@ export class UserRecord implements  UserEntity {
     return passwordRegex.test(this.password);
   }
 
-  async getOne(mail: string): Promise<UserEntity | null> {
-    const [results] = await pool.execute("SELECT * FROM `users` WHERE mail=:mail", { mail }) as UserRecordResults;
+  async getOne(email: string): Promise<UserEntity | null> {
+    const [results] = await pool.execute("SELECT * FROM `users` WHERE email=:email", { email }) as UserRecordResults;
     return results.length === 0 ? null : new UserRecord(results[0] as UserEntity)
 
   }
 
   async checkPassword() {
     if (this.checkPasswordStrength()) {
-      const user: UserEntity | null = await this.getOne(this.mail);
+      const user: UserEntity | null = await this.getOne(this.email);
       if (user === null) {
         throw new ValidationError('Podany został nie prawidłowy adres e-mail')
       }
