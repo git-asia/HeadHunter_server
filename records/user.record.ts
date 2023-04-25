@@ -1,9 +1,8 @@
 import {FieldPacket} from "mysql2";
-import {UserEntity} from "../types/user.entity";
 import {ValidationError} from "../utils/errors";
 import {pool} from "../config/db-sample";
 import {v4 as uuid} from "uuid";
-import {RegistrationTokenEntity} from "../types/registration-token.entity";
+import {RegistrationTokenEntity, UserEntity} from "../types";
 
 type UserRecordResult = [UserRecord[], FieldPacket[]];
 type RegistrationTokenResult = [RegistrationTokenEntity[], FieldPacket[]];
@@ -67,13 +66,6 @@ export class UserRecord implements UserEntity {
             userId: id,
             token: newToken,
         });
-    }
-
-    static async getOneUser(id: string): Promise<UserRecord | null> {
-        const [results] = (await pool.execute("SELECT * FROM `users` WHERE `userId` = :id", {
-            id,
-        })) as UserRecordResult;
-        return results.length === 0 ? null : new UserRecord(results[0]);
     }
 
     static async updatePassword(id: string, hashPassword: string): Promise<void> {
