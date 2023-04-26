@@ -1,8 +1,4 @@
-// import { UserEntity } from "../types";
-import {ValidationError} from "../utils/errors";
-
 import {FieldPacket} from "mysql2";
-import bcrypt from "bcrypt";
 import { pool } from "../config/db-sample";
 import { UserEntity } from "../types";
 
