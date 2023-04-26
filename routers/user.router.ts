@@ -1,14 +1,24 @@
-import {Router} from "express";
 import {Request, Response, Router} from "express";
 import {UserRecord} from "../records/user.record";
 import {ValidationError} from "../utils/errors";
 import {hash} from "bcrypt";
+import { UserEntity } from "../types";
 
 export const userRouter = Router();
 
-// zalogowany hrowiec
 userRouter
 
+      .post("/login", async (req: Request, res: Response) => {
+      const params= {...req.body} as UserEntity;
+      const newParams = new UserRecord(params);
+      if(await newParams.checkPassword()){
+          console.log('Dane logowania są prawidłowe');
+          //TODO: miejsce na ustawienie tokena passport
+      }else{
+          throw new ValidationError("Błędne hasło")
+      }
+
+    })
     .post("/refresh", async (req, res) => {
         // refresh jwt
     })
@@ -69,3 +79,4 @@ userRouter
         await UserRecord.updatePassword(id, hashPassword);
         res.json(id);
     });
+
