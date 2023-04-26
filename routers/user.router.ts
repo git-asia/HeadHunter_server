@@ -1,29 +1,37 @@
-import { Router } from "express";
+import {Router} from "express";
 
 export const userRouter = Router();
 
 // zalogowany hrowiec
 userRouter
 
-    .post('/all', async (req, res) => {
-        const [] = req.body; //wartości filtrów
-        // post przyjmuje formularz z filtrami wybranymi przez użytkownika
-        // wylistowanie wszystkich dostępnych kursantów (makieta2)
+    .post("/refresh", async (req, res) => {
+        // refresh jwt
     })
 
-    .post('/reserved', async (req, res) => {
-        const [] = req.body; //wartości filtrów
-        // post przyjmuje formularz z filtrami wybranymi przez użytkownika
-        // wylistowanie wszystkich zarezerwowanych kursantów + data z bazy + 10dni (makieta4)
+    .post("/login", async (req, res) => {
+
+    })
+    
+    .delete("/logout", async (req, res) => {
+        // czyszczenie tokenów i wylogowanie
     })
 
-    .get('/short/:studentId', async (req, res) => {
-        const studentId = req.params.studentId
-        // wymaga id studenta i zwraca dane do wyświetlenia pod imieniem kursanta jeśli się na niego kliknie (makieta 2 i 4)
+    .get('/about-me', async (req, res) => {
+        // id użytkownika przekazane w tokenie wymaga id użytkownika i zwraca wszystkie
+        // dane wymagane do wyświetlenia danych kursanta do edycji ich pobiera status
+        // kursanta i ewentualnych rezerwacjach od hr-u (nie jest wymagane)
     })
 
-    .get('/getcv/:studentId', async (req, res) => {
-        const studentId = req.params.studentId
-      
-        // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv kursanta (makieta 6)
-      })
+    .post('/about-me', async (req, res) => {
+        const userId = req.body
+
+        // przyjmuje formularz dodania/edycji danych i na jego podstawie wprowadza
+        // zmiany w bazie
+    })
+
+    .post('/my-status', async (req, res) => {
+        const studentId = req.body
+
+        // przyjmuje dane o statusie (zatrudniony lub nie)  i  wprowadza zmiany w bazie
+    })
