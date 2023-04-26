@@ -4,7 +4,7 @@ export const pool = createPool({
     /** Database hostname */
     host: 'localhost',
     /** Database username */
-    user: '',
+    user: 'root',
     /** Database password */
     password: '',
     /** Database name */
