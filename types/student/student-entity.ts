@@ -1,28 +1,40 @@
-export interface StudentEntity{
+
+export interface FilterStudent{
+  courseCompletion: number;
+  courseEngagment: number;
+  teamProjectDegree: number;
+  projectDegree: number;
+  expectedTypeWork: number;
+  expectedContractType: number;
+  canTakeApprenticeship:number;
+  expectedSalaryMin: number;
+  expectedSalaryMax: number;
+  monthsOfCommercialExp: number;
+}
+
+export interface AvailableStudent extends Omit<FilterStudent, 'expectedSalaryMin' | 'expectedSalaryMax'>{
   studentId: string;
   firstName: string;
   lastName: string;
+  targetWorkCity: string;
+  expectedSalary: number;
+}
+
+export interface StudentEntity extends AvailableStudent{
+
   phoneNumber: string | null;
   githubUsername:string;
   portfolioUrls: string | null;
   projectUrls:string;
   bio:string | | null;
-  expectedTypeWork: number;
-  targetWorkCity: string;
-  expectedContractType: number;
-  expectedSalary: number;
-  canTakeApprenticeship:number;
-  monthsOfCommercialExp: number;
   education:string | null;
   workExperience:string | null;
   courses:	string | null;
   userStatus: string;
-  courseCompletion: number;
-  courseEngagment: number;
-  projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls:string | null;
   reservedBy:string | null;
-  reservationExpiresOn: Date;
+  reservationExpiresOn: Date | null;
 }
+
 
