@@ -4,11 +4,11 @@ export const pool = createPool({
     /** Database hostname */
     host: 'localhost',
     /** Database username */
-    user: '',
+    user: 'root',
     /** Database password */
     password: '',
     /** Database name */
-    database: '',
+    database: 'megak_project',
     namedPlaceholders: true,
     decimalNumbers: true,
 })
