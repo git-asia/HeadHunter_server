@@ -1,8 +1,12 @@
 import express, {json} from "express";
+// import cors from 'cors';
 import 'express-async-errors';
 import {studentRouter} from "./routers/student.router";
 
 const app = express();
+
+// app.use(cors({
+//     origin: 'http://localhost:3000,' }));
 
 app.use(json());
 
