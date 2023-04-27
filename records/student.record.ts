@@ -1,6 +1,6 @@
 import { FieldPacket } from "mysql2";
 import { ValidationError } from "../utils/errors";
-import { StudentEntity } from "../types/student";
+import { StudentEntity } from "../types";
 
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
@@ -26,7 +26,7 @@ export class StudentRecord implements StudentEntity {
   courses:	string | null;
   userStatus: string;
   courseCompletion: number;
-  courseEngagment: number;
+  courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls:string | null;
@@ -53,7 +53,7 @@ export class StudentRecord implements StudentEntity {
     this.courses = obj.courses;
     this.userStatus = obj.userStatus;
     this.courseCompletion = obj.courseCompletion;
-    this.courseEngagment = obj.courseEngagment;
+    this.courseEngagement = obj.courseEngagement;
     this.projectDegree = obj.projectDegree;
     this.teamProjectDegree = obj.teamProjectDegree;
     this.bonusProjectUrls = obj.bonusProjectUrls;
