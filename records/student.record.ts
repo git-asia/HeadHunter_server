@@ -2,6 +2,7 @@ import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
 import {StudentEntity} from "../types/student";
 import {Octokit} from "octokit";
+import {pool} from "../config/db-sample";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -18,6 +19,13 @@ const checkGitHub = async (userName: string): Promise<string | null> => {
   }
 }
 
+const checkGithubUsername = async (ghUserName: string): Promise<string | null> => {
+  const [results] = (await pool.execute("SELECT `studentId` FROM `students` WHERE `githubUsername` = :ghUsername", {
+    ghUserName,
+  })) as StudentRecordResult;
+  return results.length === 0 ? null : results[0].studentId;
+}
+
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
 export class StudentRecord implements StudentEntity {
@@ -26,7 +34,7 @@ export class StudentRecord implements StudentEntity {
   firstName: string;
   lastName: string;
   phoneNumber: string | null;
-  githubUsername:string;
+  githubUsername: string;
   portfolioUrls: string | null;
   projectUrls: string;
   bio: string | null;
@@ -61,7 +69,10 @@ export class StudentRecord implements StudentEntity {
     if (checkGitHub(this.githubUsername) === null) {
       throw new ValidationError("Nie ma takiego konta GitHub");
     }
-    // @TODO czy unikalny githubUsername w systemie
+
+    if (checkGithubUsername(this.githubUsername) !== null) {
+      throw new ValidationError("Taki użytkownik GitHuba już istnieje");
+    }
 
     const phoneRegex = /(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-8]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}/
     if (!phoneRegex.test(this.phoneNumber) && this.phoneNumber !== '') {
