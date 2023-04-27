@@ -17,23 +17,23 @@ export interface AvailableStudent extends Omit<FilterStudent, 'expectedSalaryMin
   firstName: string;
   lastName: string;
   targetWorkCity: string;
-  expectedSalary: number;
+  expectedSalary: "" | number;
 }
 
-export interface StudentEntity extends AvailableStudent{
+export interface StudentEntity extends AvailableStudent {
 
   phoneNumber: string | null;
-  githubUsername:string;
+  githubUsername: string;
   portfolioUrls: string | null;
-  projectUrls:string;
-  bio:string | | null;
-  education:string | null;
-  workExperience:string | null;
-  courses:	string | null;
+  projectUrls: string;
+  bio: string | null;
+  education: string | null;
+  workExperience: string | null;
+  courses: string | null;
   userStatus: string;
   teamProjectDegree: number;
-  bonusProjectUrls:string | null;
-  reservedBy:string | null;
+  bonusProjectUrls: string | null;
+  reservedBy: string | null;
   reservationExpiresOn: Date | null;
 }
 

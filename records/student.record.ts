@@ -1,7 +1,22 @@
-import { FieldPacket } from "mysql2";
-import { ValidationError } from "../utils/errors";
-import { StudentEntity } from "../types/student";
+import {FieldPacket} from "mysql2";
+import {ValidationError} from "../utils/errors";
+import {StudentEntity} from "../types/student";
+import {Octokit} from "octokit";
 
+const checkGitHub = async (userName: string): Promise<string | null> => {
+  try {
+    const octokit = new Octokit({});
+    const userName = await octokit.request('GET /users/{username}', {
+      username: userName,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+    return userName.data.login;
+  } catch (e) {
+    return null;
+  }
+}
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
@@ -13,8 +28,8 @@ export class StudentRecord implements StudentEntity {
   phoneNumber: string | null;
   githubUsername:string;
   portfolioUrls: string | null;
-  projectUrls:string;
-  bio:string | | null;
+  projectUrls: string;
+  bio: string | null;
   expectedTypeWork: number;
   targetWorkCity: string;
   expectedContractType: number;
@@ -34,6 +49,28 @@ export class StudentRecord implements StudentEntity {
   reservationExpiresOn: Date;
 
   constructor(obj:StudentEntity) {
+
+    if (!obj.firstName) {
+      throw new ValidationError("Musisz podać imię");
+    }
+
+    if (!obj.lastName) {
+      throw new ValidationError("Musisz podać nazwisko");
+    }
+
+    if (checkGitHub(this.githubUsername) === null) {
+      throw new ValidationError("Nie ma takiego konta GitHub");
+    }
+    // @TODO czy unikalny githubUsername w systemie
+
+    const phoneRegex = /(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-8]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}/
+    if (!phoneRegex.test(this.phoneNumber) && this.phoneNumber !== '') {
+      throw new ValidationError('Podaj poprawny numer polskiego telefonu lub Nie podawaj żadnego');
+    }
+    if (this.monthsOfCommercialExp < 0) {
+      throw new ValidationError("Długość doświadczenia muli być liczbą nieujemną")
+    }
+
     this.studentId = obj.studentId;
     this.firstName = obj.firstName;
     this.lastName = obj.lastName;
@@ -60,7 +97,6 @@ export class StudentRecord implements StudentEntity {
     this.reservedBy = obj.reservedBy;
     this.reservationExpiresOn = obj.reservationExpiresOn;
   }
-
 
 
 }
