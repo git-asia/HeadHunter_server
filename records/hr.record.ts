@@ -1,7 +1,9 @@
 import {HrEntity} from "../types";
 import {ValidationError} from "../utils/errors";
+import {UserRecord} from "./user.record";
 
 export class HrRecord implements HrEntity {
+    hrId: string;
     email: string;
     fullName: string;
     company: string;
@@ -14,7 +16,9 @@ export class HrRecord implements HrEntity {
         if (!obj.email.includes('@')) {
             throw new ValidationError("To nie jest prawidłowy adres e-mail");
         }
-        // @TODO sprawdzić, czy email unikalny
+        if (this.checkMail !== null) {
+            throw new ValidationError("Taki adres e-mail już istnieje w bazie");
+        }
         if (!obj.fullName) {
             throw new ValidationError("HR musi posiadać imię i nazwisko");
         }
@@ -30,5 +34,9 @@ export class HrRecord implements HrEntity {
         this.fullName = obj.fullName;
         this.company = obj.company;
         this.maxReservedStudents = obj.maxReservedStudents;
+    }
+
+    async checkMail(email: string) {
+        return await UserRecord.checkEmail(email);
     }
 }
