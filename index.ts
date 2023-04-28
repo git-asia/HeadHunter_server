@@ -1,9 +1,6 @@
 import express, {json} from "express";
 // import cors from 'cors';
 import 'express-async-errors';
-import { userRouter } from "./routers/user.router";
-
-
 import {adminRouter} from "./routers/admin.router";
 import {homeRouter} from "./routers/home.router";
 import {studentRouter} from "./routers/student.router";

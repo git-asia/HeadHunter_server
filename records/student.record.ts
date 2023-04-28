@@ -14,7 +14,7 @@ export class StudentRecord implements StudentEntity {
   githubUsername:string;
   portfolioUrls: string | null;
   projectUrls:string;
-  bio:string | | null;
+  bio:string | null;
   expectedTypeWork: number;
   targetWorkCity: string;
   expectedContractType: number;
