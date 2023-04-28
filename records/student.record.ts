@@ -35,18 +35,18 @@ export class StudentRecord implements StudentEntity {
   lastName: string;
   phoneNumber: string | null;
   githubUsername: string;
-  portfolioUrls: string | null;
-  projectUrls: string;
+  portfolioUrls: string[] | null;
+  projectUrls: string[];
   bio: string | null;
   expectedTypeWork: number;
   targetWorkCity: string;
   expectedContractType: number;
-  expectedSalary: number;
-  canTakeApprenticeship:number;
+  expectedSalary: '' | number;
+  canTakeApprenticeship: number;
   monthsOfCommercialExp: number;
-  education:string | null;
-  workExperience:string | null;
-  courses:	string | null;
+  education: string | null;
+  workExperience: string | null;
+  courses: string | null;
   userStatus: string;
   courseCompletion: number;
   courseEngagment: number;
@@ -81,6 +81,21 @@ export class StudentRecord implements StudentEntity {
     if (this.monthsOfCommercialExp < 0) {
       throw new ValidationError("Długość doświadczenia muli być liczbą nieujemną")
     }
+    if (this.expectedSalary !== '' && isNaN(this.expectedSalary)) {
+      throw new ValidationError("Oczekiwana wysokość pensji musi być liczną")
+    }
+
+    this.portfolioUrls.forEach(el => {
+      if (!/^(ftp|http|https):\/\/[^ "]+$/.test(el)) {
+        throw new ValidationError("To nie jest link do portfolio")
+      }
+    })
+
+    this.projectUrls.forEach(el => {
+      if (!/^(http(s?):\/\/)?(www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/.test(el)) {
+        throw new ValidationError("To nie jest link do projektu w GitHub")
+      }
+    })
 
     this.studentId = obj.studentId;
     this.firstName = obj.firstName;

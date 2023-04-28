@@ -24,8 +24,8 @@ export interface StudentEntity extends AvailableStudent {
 
   phoneNumber: string | null;
   githubUsername: string;
-  portfolioUrls: string | null;
-  projectUrls: string;
+  portfolioUrls: string[] | null;
+  projectUrls: string[];
   bio: string | null;
   education: string | null;
   workExperience: string | null;
