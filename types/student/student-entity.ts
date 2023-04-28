@@ -26,7 +26,7 @@ export interface StudentEntity extends AvailableStudent{
   githubUsername:string;
   portfolioUrls: string | null;
   projectUrls:string;
-  bio:string | | null;
+  bio:string | null;
   education:string | null;
   workExperience:string | null;
   courses:	string | null;
