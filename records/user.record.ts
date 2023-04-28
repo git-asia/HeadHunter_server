@@ -1,7 +1,7 @@
 import {ValidationError} from "../utils/errors";
 import {RegistrationTokenEntity, UserEntity} from "../types";
 import {FieldPacket} from "mysql2";
-import { pool } from "../config/db";
+import { pool } from "../config/db-sample";
 import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
 
