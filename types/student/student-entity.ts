@@ -1,4 +1,3 @@
-
 export interface FilterStudent{
   courseCompletion: number;
   courseEngagement: number;
@@ -36,5 +35,4 @@ export interface StudentEntity extends AvailableStudent{
   reservedBy:string | null;
   reservationExpiresOn: Date | null;
 }
-
 

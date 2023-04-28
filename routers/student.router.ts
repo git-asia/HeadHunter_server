@@ -1,4 +1,5 @@
 import {Request, Response, Router} from "express";
+import {StudentRecord} from "../records/studenter.record";
 
 export const studentRouter = Router();
 
@@ -19,10 +20,11 @@ studentRouter
     })
 
     .get('/short/:studentId', async (req, res) => {
-        const studentId = req.params.studentId
-        // wymaga id studenta i zwraca dane do wyświetlenia pod imieniem kursanta jeśli
-        // się na niego kliknie (makieta 2 i 4)
-    })
+    const studentsShortinfo = await StudentRecord.studentShortInfo(
+        req.params.studentId
+    );
+    res.json(studentsShortinfo[0]);
+})
     
     .get('/getcv/:studentId', async (req, res) => {
         const studentId = req.params.studentId
@@ -30,3 +32,4 @@ studentRouter
         // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
         // kursanta (makieta 6)
     })
+
