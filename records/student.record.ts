@@ -1,8 +1,7 @@
 import { FieldPacket } from "mysql2";
 import { ValidationError } from "../utils/errors";
 import { StudentEntity } from "../types";
-import { pool } from "../config/db-sample";
-
+import { pool } from "../config/db";
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
