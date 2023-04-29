@@ -1,15 +1,17 @@
 export interface ReservedStudent {
-    name: string;
+    studentId: string;
+    firstName: string;
+    lastName: string;
     avatar: string;
-    courseDegree: number;
-    activityDegree: number;
+    courseCompletion: number;
+    courseEngagment: number;
     projectDegree: number;
     teamProjectDegree: number;
     expectedTypeWork: number;
-    expectedWorkCity: string;
+    targetWorkCity: string;
     expectedContractType: number;
     expectedSalary: number;
     canTakeApprenticeship: boolean;
     monthsOfCommercialExp: number;
-    reservationTo: Date;
+    reservationExpiresOn: Date;
 }
