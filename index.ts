@@ -17,7 +17,7 @@ app.use(json());
 app.use(handleError);
 
 app.use('/user', userRouter);
-app.use('/students', studentRouter);
+app.use('/student', studentRouter);
 app.use('/manage', adminRouter);
 app.use('/', homeRouter);
 

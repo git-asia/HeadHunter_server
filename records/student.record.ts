@@ -62,9 +62,11 @@ export class StudentRecord implements StudentEntity {
   }
 
 
-  static async studentShortInfo(id:string): Promise<StudentRecord[]> {
-    const [results] = await pool.execute("SELECT `email`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE `studentId` = :id",{
-        id
+  static async studentShortInfo(page:number, perPage:number): Promise<StudentRecord[]> {
+    const quantity = (page - 1) * perPage
+    const [results] = await pool.execute("SELECT `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` LIMIT :perPage OFFSET :quantity",{
+       quantity,
+       perPage
     }) as StudentRecordResult;
     return results;
 }
