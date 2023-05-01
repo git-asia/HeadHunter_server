@@ -103,28 +103,24 @@ static filterBy(canTakeApprenticeship:String, monthsOfCommercialExp:string) {
   return filterQuery
 }  
 
-static filterStarRating(courseCompletion:String, courseEngagement:string, projectDegree:string, teamProjectDegree:string) {
+static filterStarRating(courseCompletion:string, courseEngagement:string, projectDegree:string, teamProjectDegree:string) {
+  interface Data {
+    [key: string]: string | undefined;
+  }
   let starRating = ' '
+  const tab:Data[] = [{"courseCompletion": courseCompletion},{"courseEngagement": courseEngagement},{"projectDegree": projectDegree},{"teamProjectDegree": teamProjectDegree}];
   
-  if (courseCompletion !== undefined ) {
-    starRating += ` AND courseCompletion = '${courseCompletion}'`
-  }
-
-  if (courseEngagement !== undefined ) {
-    starRating += ` AND courseEngagement = '${courseEngagement}'`
-  }
-
-  if (projectDegree !== undefined ) {
-    starRating += ` AND projectDegree = '${projectDegree}'`
-  }
-
-  if (teamProjectDegree !== undefined ) {
-    starRating += ` AND teamProjectDegree = '${teamProjectDegree}'`
-  }
-
+  tab.forEach(obj => {
+    for (let key in obj) {
+      const value = obj[key];
+      if (value !== undefined ) {
+        starRating += ` AND`
+        starRating += ` ${key} IN (${value.split('')})`
+      }
+    }
+  });
 
   return starRating
-
 }
 
 
@@ -135,7 +131,7 @@ static filterStarRating(courseCompletion:String, courseEngagement:string, projec
     query += this.filterBySearch(data.search)
     query += this.filterBy(data.canTakeApprenticeship, data.monthsOfCommercialExp)
     query += this.filterByPayment(data.min, data.max)
-    // query += this.filterStarRating(data.courseCompletion, data.courseEngagement, data.projectDegree, data.teamProjectDegree)
+    query += this.filterStarRating(data.courseCompletion, data.courseEngagement, data.projectDegree, data.teamProjectDegree)
     query += this.pagination(data.page, data.perPage)
 
     console.log(query)
