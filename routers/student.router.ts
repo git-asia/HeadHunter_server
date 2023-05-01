@@ -6,9 +6,15 @@ export const studentRouter = Router();
 studentRouter
 
     .get('/all', async (req, res) => {
-        const page = Number(req.query.page)
-        const perPage = Number(req.query.perPage)
-        const studentsShortinfo = await StudentRecord.studentShortInfo(page, perPage);
+        // const search = String(req.query.search)
+        // const page = Number(req.query.page)
+        // const perPage = Number(req.query.perPage)
+        // const canTakeApprenticeship = String(req.query.canTakeApprenticeship)
+        const {...data } = req.query;
+        
+        console.log(typeof(String(data)))
+        
+        const studentsShortinfo = await StudentRecord.studentShortInfo(data);
         res.json(studentsShortinfo);
     })
 

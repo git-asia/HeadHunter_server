@@ -62,12 +62,84 @@ export class StudentRecord implements StudentEntity {
   }
 
 
-  static async studentShortInfo(page:number, perPage:number): Promise<StudentRecord[]> {
+  static pagination(page:number, perPage:number) {
     const quantity = (page - 1) * perPage
-    const [results] = await pool.execute("SELECT `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` LIMIT :perPage OFFSET :quantity",{
-       quantity,
-       perPage
-    }) as StudentRecordResult;
+    return ` LIMIT ${perPage} OFFSET ${quantity}`
+}
+
+static filterBySearch(search:string) {
+  let searchQuery = ' '
+
+  if (search !==  undefined){
+    searchQuery += ` AND targetWorkCity LIKE '%${search}%'`
+  }
+  return searchQuery
+}
+
+static filterByPayment(min:string, max:string) {
+  let paymentFilter = ' '
+  if (min && max !== undefined) {
+    paymentFilter += ` AND expectedSalary BETWEEN ${min} AND ${max}`
+  }
+  else if (min !==  undefined){
+    paymentFilter += ` AND expectedSalary > ${min}`
+  }
+  else if (max !==  undefined){
+    paymentFilter += ` AND expectedSalary < ${max}`
+  }
+  return paymentFilter
+}
+
+static filterBy(canTakeApprenticeship:String, monthsOfCommercialExp:string) {
+  let filterQuery = ' '
+  if (canTakeApprenticeship !== undefined ) {
+    filterQuery += ` AND canTakeApprenticeship = '${canTakeApprenticeship}'`
+  }
+
+  if (monthsOfCommercialExp !== undefined ) {
+    filterQuery += ` AND monthsOfCommercialExp = '${monthsOfCommercialExp}'`
+  }
+
+  return filterQuery
+}  
+
+static filterStarRating(courseCompletion:String, courseEngagement:string, projectDegree:string, teamProjectDegree:string) {
+  let starRating = ' '
+  
+  if (courseCompletion !== undefined ) {
+    starRating += ` AND courseCompletion = '${courseCompletion}'`
+  }
+
+  if (courseEngagement !== undefined ) {
+    starRating += ` AND courseEngagement = '${courseEngagement}'`
+  }
+
+  if (projectDegree !== undefined ) {
+    starRating += ` AND projectDegree = '${projectDegree}'`
+  }
+
+  if (teamProjectDegree !== undefined ) {
+    starRating += ` AND teamProjectDegree = '${teamProjectDegree}'`
+  }
+
+
+  return starRating
+
+}
+
+
+
+
+  static async studentShortInfo(data:any ): Promise<StudentRecord[]> {
+    let query = "SELECT `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE 1=1"
+    query += this.filterBySearch(data.search)
+    query += this.filterBy(data.canTakeApprenticeship, data.monthsOfCommercialExp)
+    query += this.filterByPayment(data.min, data.max)
+    // query += this.filterStarRating(data.courseCompletion, data.courseEngagement, data.projectDegree, data.teamProjectDegree)
+    query += this.pagination(data.page, data.perPage)
+
+    console.log(query)
+    const [results] = await pool.execute(query) as StudentRecordResult;
     return results;
 }
 }
