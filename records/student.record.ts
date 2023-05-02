@@ -62,7 +62,7 @@ export class StudentRecord implements StudentEntity {
   }
 
   static pagination(page: number, perPage: number): string {
-    const quantity = (page - 1) * perPage;
+    const quantity = page * perPage;
     return ` LIMIT ${perPage} OFFSET ${quantity}`;
   }
 
