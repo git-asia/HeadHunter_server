@@ -1,4 +1,4 @@
-import { Router } from "express";
+import {Request, Response, Router} from "express";
 import {StudentRecord} from "../records/student.record";
 
 export const studentRouter = Router();

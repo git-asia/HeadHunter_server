@@ -1,11 +1,12 @@
-import { FieldPacket } from 'mysql2';
-import { ValidationError } from '../utils/errors';
-import { StudentEntity, filterData, filterEntity } from '../types';
-import { pool } from '../config/db-sample';
+import { FieldPacket } from "mysql2";
+import { ValidationError } from "../utils/errors";
+import { FilterData, StudentEntity } from "../types";
+import { pool } from "../config/db-sample";
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
 export class StudentRecord implements StudentEntity {
+
   studentId: string;
   firstName: string;
   lastName: string;
@@ -94,7 +95,7 @@ export class StudentRecord implements StudentEntity {
     expectedContractType: string,
   ): string {
     let filterQuery = ' ';
-    const tab: filterData[] = [
+    const tab: FilterData[] = [
       {
         expectedTypeWork: expectedTypeWork,
       },
@@ -129,7 +130,7 @@ export class StudentRecord implements StudentEntity {
     teamProjectDegree: string,
   ): string {
     let starRating = ' ';
-    const tab: filterData[] = [
+    const tab: FilterData[] = [
       {
         courseCompletion: courseCompletion,
       },

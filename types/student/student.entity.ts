@@ -36,13 +36,6 @@ export interface StudentEntity extends AvailableStudent{
   reservationExpiresOn: Date | null;
 }
 
-export interface filterData {
+export interface FilterData {
   [key: string]: string | undefined;
-}
-
-
-export interface filterEntity {
-  page: number;
-  perPage: number;
-  search: string;
 }
