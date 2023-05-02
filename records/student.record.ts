@@ -41,7 +41,7 @@ export class StudentRecord implements StudentEntity {
   expectedTypeWork: number;
   targetWorkCity: string;
   expectedContractType: number;
-  expectedSalary: '' | number;
+  expectedSalary: number;
   canTakeApprenticeship: number;
   monthsOfCommercialExp: number;
   education: string | null;
@@ -81,7 +81,7 @@ export class StudentRecord implements StudentEntity {
     if (this.monthsOfCommercialExp < 0) {
       throw new ValidationError("Długość doświadczenia musi być liczbą nieujemną")
     }
-    if (this.expectedSalary !== '' && isNaN(this.expectedSalary)) {
+    if (isNaN(this.expectedSalary)) {
       throw new ValidationError("Oczekiwana wysokość pensji musi być liczbą")
     }
 
