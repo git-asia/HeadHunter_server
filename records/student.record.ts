@@ -76,13 +76,13 @@ export class StudentRecord implements StudentEntity {
 
     const phoneRegex = /(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-8]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}/
     if (!phoneRegex.test(this.phoneNumber) && this.phoneNumber !== '') {
-      throw new ValidationError('Podaj poprawny numer polskiego telefonu lub Nie podawaj żadnego');
+      throw new ValidationError('Podaj poprawny numer polskiego telefonu lub nie podawaj żadnego');
     }
     if (this.monthsOfCommercialExp < 0) {
-      throw new ValidationError("Długość doświadczenia muli być liczbą nieujemną")
+      throw new ValidationError("Długość doświadczenia musi być liczbą nieujemną")
     }
     if (this.expectedSalary !== '' && isNaN(this.expectedSalary)) {
-      throw new ValidationError("Oczekiwana wysokość pensji musi być liczną")
+      throw new ValidationError("Oczekiwana wysokość pensji musi być liczbą")
     }
 
     this.portfolioUrls.forEach(el => {
@@ -123,6 +123,5 @@ export class StudentRecord implements StudentEntity {
     this.reservedBy = obj.reservedBy;
     this.reservationExpiresOn = obj.reservationExpiresOn;
   }
-
 
 }
