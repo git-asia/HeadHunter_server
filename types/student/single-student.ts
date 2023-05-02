@@ -5,7 +5,7 @@ export interface SingleStudent {
     githubUsername: string;
     phoneNumber: string | null;
     email: string;
-    bio: string | | null;
+    bio: string | null;
     courseCompletion: number;
     courseEngagment: number;
     projectDegree: number;
