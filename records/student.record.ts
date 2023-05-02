@@ -74,9 +74,9 @@ export class StudentRecord implements StudentEntity {
       throw new ValidationError("Taki użytkownik GitHuba już istnieje");
     }
 
-    const phoneRegex = /(?:(?:(?:\+|00)?48)|(?:\(\+?48\)))?(?:1[2-8]|2[2-69]|3[2-49]|4[1-8]|5[0-9]|6[0-35-9]|[7-8][1-9]|9[145])\d{7}/
+    const phoneRegex = /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
     if (!phoneRegex.test(this.phoneNumber) && this.phoneNumber !== '') {
-      throw new ValidationError('Podaj poprawny numer polskiego telefonu lub nie podawaj żadnego');
+      throw new ValidationError('Podaj poprawny numer telefonu lub nie podawaj żadnego');
     }
     if (this.monthsOfCommercialExp < 0) {
       throw new ValidationError("Długość doświadczenia musi być liczbą nieujemną")
