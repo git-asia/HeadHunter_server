@@ -1,7 +1,7 @@
 export interface UserEntity {
-    userId: string;
+    userId?: string;
     email: string;
     password: string;
-    authToken: string;
-    userState: number;
+    authToken?: string;
+    userState?: number;
 }

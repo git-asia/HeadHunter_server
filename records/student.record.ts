@@ -1,7 +1,7 @@
 import { FieldPacket } from "mysql2";
 import { ValidationError } from "../utils/errors";
-import { StudentEntity } from "../types/student";
-
+import { StudentEntity } from "../types";
+import { pool } from "../config/db-sample";
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
@@ -14,7 +14,7 @@ export class StudentRecord implements StudentEntity {
   githubUsername:string;
   portfolioUrls: string | null;
   projectUrls:string;
-  bio:string | | null;
+  bio:string | null;
   expectedTypeWork: number;
   targetWorkCity: string;
   expectedContractType: number;
@@ -26,7 +26,7 @@ export class StudentRecord implements StudentEntity {
   courses:	string | null;
   userStatus: string;
   courseCompletion: number;
-  courseEngagment: number;
+  courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls:string | null;
@@ -53,7 +53,7 @@ export class StudentRecord implements StudentEntity {
     this.courses = obj.courses;
     this.userStatus = obj.userStatus;
     this.courseCompletion = obj.courseCompletion;
-    this.courseEngagment = obj.courseEngagment;
+    this.courseEngagement = obj.courseEngagement;
     this.projectDegree = obj.projectDegree;
     this.teamProjectDegree = obj.teamProjectDegree;
     this.bonusProjectUrls = obj.bonusProjectUrls;
@@ -62,5 +62,10 @@ export class StudentRecord implements StudentEntity {
   }
 
 
-
+  static async studentShortInfo(id:string): Promise<StudentRecord[]> {
+    const [results] = await pool.execute("SELECT `email`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE `studentId` = :id",{
+        id
+    }) as StudentRecordResult;
+    return results;
+}
 }
