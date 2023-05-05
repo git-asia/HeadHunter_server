@@ -123,7 +123,7 @@ export class StudentRecord implements StudentEntity {
     return filterQuery;
   }
 
-  static filterStarRating(
+  static filterRating(
     courseCompletion: string,
     courseEngagement: string,
     projectDegree: string,
@@ -149,8 +149,7 @@ export class StudentRecord implements StudentEntity {
       for (let key in obj) {
         const value = obj[key];
         if (value !== undefined) {
-          starRating += ` AND`;
-          starRating += ` ${key} IN (${value.split('')})`;
+          starRating += ` AND ${key} >= ${value}`;
         }
       }
     });
@@ -169,7 +168,7 @@ export class StudentRecord implements StudentEntity {
       data.expectedContractType,
     );
     query += this.filterByPayment(data.min, data.max);
-    query += this.filterStarRating(
+    query += this.filterRating(
       data.courseCompletion,
       data.courseEngagement,
       data.projectDegree,
