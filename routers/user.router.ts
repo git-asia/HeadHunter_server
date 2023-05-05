@@ -1,7 +1,7 @@
 import {Request, Response, Router} from "express";
-import {UserRecord} from "../records/user.record";
 import {ValidationError} from "../utils/errors";
 import {hash} from "bcrypt";
+import {UserRecord} from "../records/user.record";
 import { UserEntity } from "../types";
 
 export const userRouter = Router();
