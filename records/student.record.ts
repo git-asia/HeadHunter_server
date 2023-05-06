@@ -6,14 +6,13 @@ import {StudentEntity} from "../types";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
-    const octokit = new Octokit({});
-    const userName = await octokit.request('GET /users/{username}', {
+    const resUserName = await new Octokit({}).request('GET /users/{username}', {
       username: userName,
       headers: {
         'X-GitHub-Api-Version': '2022-11-28'
       }
     })
-    return userName.data.login;
+    return resUserName.data.login;
   } catch (e) {
     return null;
   }
@@ -49,7 +48,7 @@ export class StudentRecord implements StudentEntity {
   courses: string | null;
   userStatus: string;
   courseCompletion: number;
-  courseEngagement: number;
+  courseEngagment: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls:string | null;
@@ -142,7 +141,7 @@ export class StudentRecord implements StudentEntity {
     this.courses = obj.courses;
     this.userStatus = obj.userStatus;
     this.courseCompletion = obj.courseCompletion;
-    this.courseEngagement = obj.courseEngagement;
+    this.courseEngagment = obj.courseEngagment;
     this.projectDegree = obj.projectDegree;
     this.teamProjectDegree = obj.teamProjectDegree;
     this.bonusProjectUrls = obj.bonusProjectUrls;
