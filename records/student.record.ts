@@ -48,7 +48,7 @@ export class StudentRecord implements StudentEntity {
   courses: string | null;
   userStatus: string;
   courseCompletion: number;
-  courseEngagment: number;
+  courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
   bonusProjectUrls:string | null;
@@ -90,7 +90,7 @@ export class StudentRecord implements StudentEntity {
       throw new ValidationError("Ocena musi być w zakresie 0-5")
     }
 
-    if (this.courseEngagment < 0 || this.courseEngagment > 5){
+    if (this.courseEngagement < 0 || this.courseEngagement > 5){
       throw new ValidationError("Ocena musi być w zakresie 0-5")
     }
 
@@ -141,7 +141,7 @@ export class StudentRecord implements StudentEntity {
     this.courses = obj.courses;
     this.userStatus = obj.userStatus;
     this.courseCompletion = obj.courseCompletion;
-    this.courseEngagment = obj.courseEngagment;
+    this.courseEngagement = obj.courseEngagement;
     this.projectDegree = obj.projectDegree;
     this.teamProjectDegree = obj.teamProjectDegree;
     this.bonusProjectUrls = obj.bonusProjectUrls;

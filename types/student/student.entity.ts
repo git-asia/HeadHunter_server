@@ -1,6 +1,6 @@
 export interface FilterStudent{
   courseCompletion: number;
-  courseEngagment: number;
+  courseEngagement: number;
   teamProjectDegree: number;
   projectDegree: number;
   expectedTypeWork: number;
