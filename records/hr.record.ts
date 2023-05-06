@@ -8,6 +8,7 @@ export class HrRecord implements HrEntity {
     maxReservedStudents: number;
 
     constructor(obj: HrEntity) {
+    
         if (!obj.fullName) {
             throw new ValidationError("HR musi posiadać imię i nazwisko");
         }
