@@ -1,8 +1,8 @@
 import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
-import {StudentEntity} from "../types/student";
 import {Octokit} from "octokit";
 import {pool} from "../config/db-sample";
+import {StudentEntity} from "../types";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -42,7 +42,7 @@ export class StudentRecord implements StudentEntity {
   targetWorkCity: string;
   expectedContractType: number;
   expectedSalary: number;
-  canTakeApprenticeship: number;
+  canTakeApprenticeship: boolean;
   monthsOfCommercialExp: number;
   education: string | null;
   workExperience: string | null;
@@ -78,11 +78,37 @@ export class StudentRecord implements StudentEntity {
     if (!phoneRegex.test(this.phoneNumber) && this.phoneNumber !== '') {
       throw new ValidationError('Podaj poprawny numer telefonu lub nie podawaj żadnego');
     }
+
     if (this.monthsOfCommercialExp < 0) {
       throw new ValidationError("Długość doświadczenia musi być liczbą nieujemną")
     }
+
     if (isNaN(this.expectedSalary)) {
       throw new ValidationError("Oczekiwana wysokość pensji musi być liczbą")
+    }
+
+    if (this.courseCompletion < 0 || this.courseCompletion > 5){
+      throw new ValidationError("Ocena musi być w zakresie 0-5")
+    }
+
+    if (this.courseEngagment < 0 || this.courseEngagment > 5){
+      throw new ValidationError("Ocena musi być w zakresie 0-5")
+    }
+
+    if (this.projectDegree < 0 || this.projectDegree > 5){
+      throw new ValidationError("Ocena musi być w zakresie 0-5")
+    }
+
+    if (this.teamProjectDegree < 0 || this.teamProjectDegree > 5){
+      throw new ValidationError("Ocena musi być w zakresie 0-5")
+    }
+
+    if (this.expectedTypeWork < 1 || this.expectedTypeWork > 5){
+      throw new ValidationError("Typ pracy musi być w zakresie 1-5")
+    }
+
+    if (this.expectedContractType < 1 || this.expectedContractType > 4){
+      throw new ValidationError("Typ kontraktu musi być w zakresie 1-4")
     }
 
     this.portfolioUrls.forEach(el => {

@@ -1,6 +1,5 @@
 import {HrEntity} from "../types";
 import {ValidationError} from "../utils/errors";
-import {UserRecord} from "./user.record";
 
 export class HrRecord implements HrEntity {
     hrId: string;
