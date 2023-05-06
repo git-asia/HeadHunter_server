@@ -1,3 +1,1 @@
-export * from './student-entity';
-export * from './reserved-student';
-export * from './single-student'
+export * from './student.entity';
