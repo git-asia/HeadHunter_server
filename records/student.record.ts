@@ -154,5 +154,32 @@ export class StudentRecord implements StudentEntity {
         id
     }) as StudentRecordResult;
     return results;
-}
+  }
+
+  static async reservedChange(action:string,studentId:string, hrId?:string) {
+
+    let userStatus;
+    let reservationExpiresOn;
+
+    if (action === 'reserve') {
+      reservationExpiresOn =new Date();
+      userStatus = 'reserved'
+    } else if (action === 'employ') {
+      reservationExpiresOn = null;
+      userStatus ='hired';
+      hrId = '';
+    } else if (action === 'disinterest'){
+      reservationExpiresOn = null;
+      userStatus ='active';
+      hrId = '';
+    }
+    else{
+      throw new ValidationError('Nie udało się wykonać zmiany statusu')
+    }
+    await pool.execute("UPDATE `students' SET reservedBy = :hrId, userStatus = :userStatus, reservationExpiresOn = :reservationExpiresOn  WHERE studentId = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
+
+
+
+
+  }
 }
