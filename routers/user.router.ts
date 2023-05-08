@@ -78,5 +78,16 @@ userRouter
         const hashPassword = await hash(pass, 10);
         await UserRecord.updatePassword(id, hashPassword);
         res.json(id);
-    });
+    })
+
+    .patch("/changemail", async (req: Request, res: Response) => {
+        const {id, email} = req.body;
+        if (!/^\S+@\S+\.\S+$/.test(email)){
+            throw new ValidationError("To nie jest prawidłowy adres e-mail")
+        }
+        await UserRecord.updateEmail(id, email);
+        res.json(id);
+    })
+
+;
 
