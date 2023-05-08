@@ -14,8 +14,9 @@ studentRouter
     })
 
     .patch('/status', async (req, res) => {
-        const {action,studentId, hrId = null}:UpdateState = req.body;
-        await StudentRecord.statusChange(action,studentId,hrId)
+        const {action,studentId, hrId = null}:UpdateStatus = req.body;
+        const message = await StudentRecord.statusChange(action,studentId,hrId);
+        res.status(200).json({ success: true, message: message });;
     })
 
     .get('/short/:studentId', async (req, res) => {
