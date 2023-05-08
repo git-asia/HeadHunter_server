@@ -1,14 +1,15 @@
 export enum TypeWork {
     'Bez znaczenia' = 1,
-    'Na miejscu' = 2,
+    'Praca w biurze' = 2,
     'Gotowość do przeprowadzki' = 3,
-    'Wyłącznie zdalnie' = 4,
+    'Praca zdalna' = 4,
     'Hybrydowo' = 5,
 }
 
 export enum ContractType {
     'Brak preferencji' = 1,
-    'Tylko umowa o pracę' = 2,
-    'Możliwa umowa business-to-business (B2B)' = 3,
-    'Możliwa umowa zlecenie lub umowa o dzieło' = 4
+    'Umowa o pracę' = 2,
+    'B2B' = 3,
+    'Umowa zlecenie' = 4,
+    'Umowa o dzieło' = 5
 }
