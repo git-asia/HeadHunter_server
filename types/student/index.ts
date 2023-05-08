@@ -1,2 +1,2 @@
 export * from './student.entity';
-export * from './updateState'
+export * from './updateStatus'
