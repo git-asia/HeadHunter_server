@@ -13,10 +13,9 @@ studentRouter
         // wszystkich dostępnych kursantów (makieta2)
     })
 
-    .post('/reserved', async (req, res) => {
-        const [] = req.body; //wartości filtrów
-        // post przyjmuje formularz z filtrami wybranymi przez użytkownika wylistowanie
-        // wszystkich zarezerwowanych kursantów + data z bazy + 10dni (makieta4)
+    .patch('/status', async (req, res) => {
+        const {action,studentId, hrId = null}:UpdateState = req.body;
+        await StudentRecord.statusChange(action,studentId,hrId)
     })
 
     .get('/short/:studentId', async (req, res) => {
