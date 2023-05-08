@@ -1,5 +1,5 @@
 interface UpdateStatus {
-  action: string;
+  action: 'reserve'| 'employ' | 'disinterest';
   studentId: string;
   hrId: string | null;
 }
