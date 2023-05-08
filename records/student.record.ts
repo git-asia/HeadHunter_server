@@ -1,7 +1,7 @@
 import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
 import {Octokit} from "octokit";
-import {pool} from "../config/db-sample";
+import {pool} from "../config/db";
 import {StudentEntity} from "../types";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
