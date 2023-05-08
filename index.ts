@@ -7,6 +7,7 @@ import { homeRouter } from './routers/home.router';
 import { studentRouter } from './routers/student.router';
 import { userRouter } from './routers/user.router';
 import { handleError } from './utils/errors';
+import { authRouter } from './routers/auth.router';
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/user', userRouter);
 app.use('/students', studentRouter);
 app.use('/manage', adminRouter);
 app.use('/', homeRouter);
+app.use('/test-jtw', authRouter)
 
 app.listen(3001, '0.0.0.0', () => {
     console.log('Listening on http://localhost:3001');

@@ -50,7 +50,7 @@ export class UserRecord /* @todo implements UserEntity //throws an error */ {
         return passwordRegex.test(this.password);
     }
 
-    async getOne(email: string): Promise</* @todo throws *UserEntity*/ any | null> {
+    static async getOne(email: string): Promise</* @todo throws *UserEntity*/ any | null> {
         const [results] = await pool.execute('SELECT * FROM `users` WHERE email=:email', { email }) as any //@todo throws UserRecordResult;
         return results.length === 0 ? null : new UserRecord(results[0] as any /* @todo throws UserEntity*/)
 
@@ -58,7 +58,7 @@ export class UserRecord /* @todo implements UserEntity //throws an error */ {
 
     async checkPassword() {
         if (this.checkPasswordStrength()) {
-            const user: UserEntity | null = await this.getOne(this.email);
+            const user: UserEntity | null = await UserRecord.getOne(this.email);
             if (user === null) {
                 throw new ValidationError('Podany został nie prawidłowy adres e-mail')
             }

@@ -14,7 +14,7 @@ userRouter
         const newParams = new UserRecord(params);
         if (await newParams.checkPassword()) {
             console.log('Dane logowania są prawidłowe');
-            const token = jwt.sign({ id: newParams.userId }, /* @todo SET SECRET KEY process.env.secret_key*/'KLUCZ', { expiresIn: '24h' });
+            const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
             res.json({ token });
         } else {
             throw new ValidationError('Błędne hasło')
