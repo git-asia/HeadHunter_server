@@ -1,33 +1,35 @@
-import {Request, Response, Router} from "express";
-import {UserRecord} from "../records/user.record";
-import {ValidationError} from "../utils/errors";
-import {hash} from "bcrypt";
-import { UserEntity } from "../types";
+import { Request, Response, Router } from 'express';
+import { UserRecord } from '../records/user.record';
+import { ValidationError } from '../utils/errors';
+import { hash } from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { UserEntity } from '../types';
 
 export const userRouter = Router();
 
 userRouter
 
-      .post("/login", async (req: Request, res: Response) => {
-      const params= {...req.body} as UserEntity;
-      const newParams = new UserRecord(params);
-      if(await newParams.checkPassword()){
-          console.log('Dane logowania są prawidłowe');
-          //TODO: miejsce na ustawienie tokena passport
-      }else{
-          throw new ValidationError("Błędne hasło")
-      }
+    .post('/login', async (req: Request, res: Response) => {
+        const params = { ...req.body } as UserEntity;
+        const newParams = new UserRecord(params);
+        if (await newParams.checkPassword()) {
+            console.log('Dane logowania są prawidłowe');
+            const token = jwt.sign({ id: newParams.userId }, /* @todo SET SECRET KEY process.env.secret_key*/'KLUCZ', { expiresIn: '24h' });
+            res.json({ token });
+        } else {
+            throw new ValidationError('Błędne hasło')
+        }
 
     })
-    .post("/refresh", async (req, res) => {
+    .post('/refresh', async (req, res) => {
         // refresh jwt
     })
+    //
+    // .post('/login', async (req, res) => {
+    //
+    // })
 
-    .post("/login", async (req, res) => {
-
-    })
-    
-    .delete("/logout", async (req, res) => {
+    .delete('/logout', async (req, res) => {
         // czyszczenie tokenów i wylogowanie
     })
 
@@ -50,12 +52,12 @@ userRouter
         // przyjmuje dane o statusie (zatrudniony lub nie)  i  wprowadza zmiany w bazie
     })
 
-    .get("/token/:token", async (req: Request, res: Response) => {
+    .get('/token/:token', async (req: Request, res: Response) => {
         const userId: string | null = await UserRecord.checkToken(req.params.token);
         res.json(userId);
     })
 
-    .get("/email/:email", async (req: Request, res: Response) => {
+    .get('/email/:email', async (req: Request, res: Response) => {
         const userId: string | null = await UserRecord.checkEmail(req.params.email);
         if (userId === null) {
             throw new ValidationError('Nie ma takiego adresu e-mail');
@@ -64,8 +66,8 @@ userRouter
         res.json(req.params.email);
     })
 
-    .patch("/newpass", async (req: Request, res: Response) => {
-        const {id, pass, pass2} = req.body;
+    .patch('/newpass', async (req: Request, res: Response) => {
+        const { id, pass, pass2 } = req.body;
 
         const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*])(?=.{8,})/;
 
@@ -79,4 +81,3 @@ userRouter
         await UserRecord.updatePassword(id, hashPassword);
         res.json(id);
     });
-
