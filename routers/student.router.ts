@@ -1,4 +1,4 @@
-import {Request, Response, Router} from "express";
+import { Request, Response, Router } from 'express';
 
 export const studentRouter = Router();
 
@@ -23,7 +23,7 @@ studentRouter
         // wymaga id studenta i zwraca dane do wyświetlenia pod imieniem kursanta jeśli
         // się na niego kliknie (makieta 2 i 4)
     })
-    
+
     .get('/getcv/:studentId', async (req, res) => {
         const studentId = req.params.studentId
 

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router } from 'express';
 
 export const adminRouter = Router();
 
@@ -16,4 +16,4 @@ adminRouter
     .post('/register', async (req, res) => {
 
         // dodanie nowych użytkowników
-      })
+    })
