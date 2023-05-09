@@ -99,7 +99,7 @@ export class UserRecord implements  UserEntity {
         return results.length === 0 ? null : results[0].userId;
     }
 
-    static async addToken(id: string): Promise<void> {
+    static async addToken(id: string): Promise<string> {
         let newToken, isThisToken;
         do {
             newToken = uuid();
@@ -120,6 +120,7 @@ export class UserRecord implements  UserEntity {
             userId: id,
             token: newToken,
         });
+        return newToken;
     }
 
     static async updatePassword(id: string, hashPassword: string): Promise<void> {
