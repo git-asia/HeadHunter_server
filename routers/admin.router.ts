@@ -9,6 +9,7 @@ export const adminRouter = Router();
 // zalogowany admin
 adminRouter
   .get('/add-hr/:email/:fullName/:company/:maxReservedStudents',async (req,res) =>{
+
     const {email,fullName,company,maxReservedStudents} = req.params
 
     const userId = uuid();
@@ -28,6 +29,7 @@ adminRouter
     await addUser.insert();
     await addHr.insert();
     await sendMail(email,'MegaK Head hunter - rejestracja',"jakś wiadomośc z linkiem aktywacyjnym  http://adres.pl/aktywacja/TOKEN"); //TODO Dodanie generowanie tokenu,  dodanie tekstu maila
+    res.status(200).json({ success: true, message: 'Użytkownik HR został dodany.' })
 
   })
 
