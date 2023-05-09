@@ -4,6 +4,7 @@ import {FieldPacket} from "mysql2";
 import { pool } from "../config/db";
 import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
+import { sendMail } from "../utils/sendMail";
 
 
 type UserRecordResult = [UserRecord[], FieldPacket[]];
@@ -13,9 +14,9 @@ export class UserRecord implements  UserEntity {
 
     userId?: string;
     email: string;
-    password: string;
-    authToken?: string;
-    userState?: number;
+    password?: string = '';
+    authToken?: string = null;
+    userState?: number = 0;
 
     constructor(obj: UserEntity) {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,6 +31,9 @@ export class UserRecord implements  UserEntity {
         this.password = obj.password;
         this.authToken = obj.authToken;
         this.userState = obj.userState;
+    }
+    async insert():Promise<void>{
+        await pool.execute("INSERT INTO `users`(`userId`, `email`, `password`, `authToken`, `userState`)", this);
     }
 
     async hashPassword(password: string, salt: string): Promise<string> {
