@@ -1,7 +1,23 @@
 import { FieldPacket } from "mysql2";
 import { ValidationError } from "../utils/errors";
+import {Octokit} from "octokit";
 import { StudentEntity } from "../types";
 import { pool } from "../config/db-sample";
+
+
+const checkGitHub = async (userName: string): Promise<string | null> => {
+  try {
+    const resUserName = await new Octokit({}).request('GET /users/{username}', {
+      username: userName,
+      headers: {
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
+    })
+    return resUserName.data.login;
+  } catch (e) {
+    return null;
+  }
+}
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
 
@@ -68,4 +84,37 @@ export class StudentRecord implements StudentEntity {
     }) as StudentRecordResult;
     return results;
 }
+
+  static async updateData(studentId: string, firstName: string, lastName: string, phoneNumber: string, githubUsername: string, portfolioUrls: string, projectUrls: string, bio: string, expectedTypeWork: number, targetWorkCity: string, expectedContractType: number, expectedSalary: number, canTakeApprenticeship: number, monthsOfCommercialExp: number, education: string, workExperience: string, courses: string, bonusProjectUrls: string) {
+
+    if (!firstName) {
+      throw new ValidationError("Musisz podać imię");
+    }
+    if (!lastName) {
+      throw new ValidationError("Musisz podać nazwisko");
+    }
+    if (checkGitHub(githubUsername) === null) {
+      throw new ValidationError("Nie ma takiego konta GitHub");
+    }
+    const phoneRegex = /^\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/
+    if (!phoneRegex.test(phoneNumber) && phoneNumber !== '') {
+      throw new ValidationError('Podaj poprawny numer telefonu lub nie podawaj żadnego');
+    }
+    if (monthsOfCommercialExp < 0) {
+      throw new ValidationError("Długość doświadczenia musi być liczbą nieujemną")
+    }
+    if (isNaN(expectedSalary)) {
+      throw new ValidationError("Oczekiwana wysokość pensji musi być liczbą")
+    }
+      if (expectedTypeWork < 1 || expectedTypeWork > 5){
+        throw new ValidationError("Typ pracy musi być w zakresie 1-5")
+      }
+      if (expectedContractType < 1 || expectedContractType > 4){
+        throw new ValidationError("Typ kontraktu musi być w zakresie 1-4")
+      }
+
+    await pool.execute("UPDATE `students` SET `firstName` = :firstName, `lastName` = :lastName, `phoneNumber` = :phoneNumber, `githubUsername` = :githubUsername, `portfolioUrls` = :portfolioUrls, `projectUrls` = :projectUrls, `bio` = :bio, `expectedTypeWork` = :expectedTypeWork, `targetWorkCity` = :targetWorkCity, `expectedContractType` = :expectedContractType, `expectedSalary` = :expectedSalary, `canTakeApprenticeship` = :canTakeApprenticeship, `monthsOfCommercialExp` = :monthsOfCommercialExp, `education` = :education, `workExperience` = :workExperience, `courses` = :courses, `bonusProjectUrls = :bonusProjectUrls`  WHERE `studentId` = :studentId", {
+      studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls
+    });
+  }
 }

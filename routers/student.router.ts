@@ -1,5 +1,6 @@
 import {Request, Response, Router} from "express";
 import {StudentRecord} from "../records/student.record";
+import {UserRecord} from "../records/user.record";
 
 export const studentRouter = Router();
 
@@ -32,4 +33,12 @@ studentRouter
         // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
         // kursanta (makieta 6)
     })
+
+    .patch('/changedata', async (req: Request, res: Response) => {
+        const {studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls} = req.body;
+
+        await StudentRecord.updateData(studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls);
+        res.json(studentId);
+        }
+    )
 
