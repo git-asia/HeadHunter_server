@@ -3,6 +3,7 @@ import {ValidationError} from "../utils/errors";
 import {Octokit} from "octokit";
 import {pool} from "../config/db";
 import {StudentEntity} from "../types";
+import { sendMail } from "../utils/sendMail";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -154,5 +155,37 @@ export class StudentRecord implements StudentEntity {
         id
     }) as StudentRecordResult;
     return results;
-}
+  }
+
+   static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
+
+    let userStatus='';
+    let reservationExpiresOn:null|Date=null;
+    let message='';
+    if (action === 'reserve') {
+      reservationExpiresOn = new Date();
+      userStatus = 'reserved'
+      message= 'Kursant został zarezerwowany';
+    } else if (action === 'employ') {
+      reservationExpiresOn = null;
+      userStatus = 'hired';
+      message= 'Kursant został zatrudniony';
+      await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO do zastanowienia się jaki tekst ma być wysyłany
+    } else if (action === 'disinterest'){
+      reservationExpiresOn = null;
+      userStatus = 'active';
+      hrId=null;
+      message= 'Zgłoszono brak zainteresowania kursantem'
+    }
+    else{
+      throw new ValidationError('Nie udało się wykonać zmiany statusu');
+    }
+
+    const [results] = await pool.execute("UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
+     if (results) {
+       return message;
+     } else {
+       throw new ValidationError('Nie udało się wykonać zmiany statusu');
+     }
+  }
 }
