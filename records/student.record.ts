@@ -34,8 +34,8 @@ export class StudentRecord implements StudentEntity {
   lastName: string;
   phoneNumber: string | null;
   githubUsername: string;
-  portfolioUrls: string[] | null;
-  projectUrls: string[];
+  portfolioUrls: string | null;
+  projectUrls: string;
   bio: string | null;
   expectedTypeWork: number;
   targetWorkCity: string;
@@ -110,13 +110,17 @@ export class StudentRecord implements StudentEntity {
       throw new ValidationError("Typ kontraktu musi być w zakresie 1-4")
     }
 
-    this.portfolioUrls.forEach(el => {
+    const portfolioUrlToArr = this.portfolioUrls.split(',');
+
+    portfolioUrlToArr.forEach(el => {
       if (!/^(ftp|http|https):\/\/[^ "]+$/.test(el)) {
         throw new ValidationError("To nie jest link do portfolio")
       }
     })
 
-    this.projectUrls.forEach(el => {
+    const projectUrlToArr = this.projectUrls.split(',');
+
+    projectUrlToArr.forEach(el => {
       if (!/^(http(s?):\/\/)?(www\.)?github\.([a-z])+\/([A-Za-z0-9]{1,})+\/?$/.test(el)) {
         throw new ValidationError("To nie jest link do projektu w GitHub")
       }

@@ -26,8 +26,8 @@ export interface ReservedStudent extends AvailableStudent {
 
 export interface StudentEntity extends ReservedStudent{
   phoneNumber: string | null;
-  portfolioUrls: string[] | null;
-  projectUrls:string[];
+  portfolioUrls: string | null;
+  projectUrls:string;
   bio:string | null;
   education:string | null;
   workExperience:string | null;
