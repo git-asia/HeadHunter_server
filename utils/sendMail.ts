@@ -3,7 +3,7 @@ import { ValidationError } from "./errors";
 import { smtpConfig } from "../config/smtp";
 
 
-export const sendMail = (mail:string,subject:string, text:string, html:string) =>{
+export const sendMail = (mail:string,subject:string, text:string, html:string='') =>{
 
 
   const transporter = nodemailer.createTransport(smtpConfig);
