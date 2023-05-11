@@ -13,9 +13,9 @@ export class UserRecord implements  UserEntity {
 
     userId?: string;
     email: string;
-    password: string;
-    authToken?: string;
-    userState?: number;
+    password?: string
+    authToken?: string
+    userState?: number
 
     constructor(obj: UserEntity) {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,6 +30,13 @@ export class UserRecord implements  UserEntity {
         this.password = obj.password;
         this.authToken = obj.authToken;
         this.userState = obj.userState;
+    }
+    async insert():Promise<void>{
+        this.password = null;
+        this.authToken = null;
+        this.userState = 0;
+
+        await pool.execute("INSERT INTO `users`(`userId`, `email`, `password`, `authToken`, `userState`) VALUES (:userId, :email, :password, :authToken, :userState)", this);
     }
 
     async hashPassword(password: string, salt: string): Promise<string> {
@@ -92,7 +99,7 @@ export class UserRecord implements  UserEntity {
         return results.length === 0 ? null : results[0].userId;
     }
 
-    static async addToken(id: string): Promise<void> {
+    static async addToken(id: string): Promise<string> {
         let newToken, isThisToken;
         do {
             newToken = uuid();
@@ -113,6 +120,7 @@ export class UserRecord implements  UserEntity {
             userId: id,
             token: newToken,
         });
+        return newToken;
     }
 
     static async updatePassword(id: string, hashPassword: string): Promise<void> {
