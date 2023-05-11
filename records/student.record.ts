@@ -52,8 +52,8 @@ export class StudentRecord implements StudentEntity {
   courseEngagement: number;
   projectDegree: number;
   teamProjectDegree: number;
-  bonusProjectUrls:string | null;
-  reservedBy:string | null;
+  bonusProjectUrls: string | null;
+  reservedBy: string | null;
   reservationExpiresOn: Date;
 
   constructor(obj:StudentEntity) {
@@ -150,12 +150,124 @@ export class StudentRecord implements StudentEntity {
     this.reservationExpiresOn = obj.reservationExpiresOn;
   }
 
-  static async studentShortInfo(id:string): Promise<StudentRecord[]> {
-    const [results] = await pool.execute("SELECT `email`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE `studentId` = :id",{
-        id
-    }) as StudentRecordResult;
+  static pagination(page: number, perPage: number): string {
+    const quantity = page * perPage;
+    return ` LIMIT ${perPage} OFFSET ${quantity}`;
+  }
+
+  static filterBySearch(search: string): string {
+    let searchQuery = ' ';
+
+    if (search !== undefined) {
+      searchQuery += ` AND targetWorkCity LIKE '%${search}%'`;
+    }
+    return searchQuery;
+  }
+
+  static filterByPayment(min: string, max: string): string {
+    let paymentFilter = ' ';
+    if (min && max !== undefined) {
+      paymentFilter += ` AND expectedSalary BETWEEN ${min} AND ${max}`;
+    } else if (min !== undefined) {
+      paymentFilter += ` AND expectedSalary >= ${min}`;
+    } else if (max !== undefined) {
+      paymentFilter += ` AND expectedSalary <= ${max}`;
+    }
+
+    return paymentFilter;
+  }
+
+  static filterBy(
+    canTakeApprenticeship: string,
+    monthsOfCommercialExp: string,
+    expectedTypeWork: string,
+    expectedContractType: string,
+  ): string {
+    let filterQuery = ' ';
+    const tab: FilterData[] = [
+      {
+        expectedTypeWork: expectedTypeWork,
+      },
+      {
+        expectedContractType: expectedContractType,
+      },
+    ];
+    tab.forEach((obj) => {
+      for (let key in obj) {
+        const value = obj[key];
+        if (value !== undefined) {
+          filterQuery += ` AND`;
+          filterQuery += ` ${key} IN (${value.split('')})`;
+        }
+      }
+    });
+    if (canTakeApprenticeship !== undefined) {
+      filterQuery += ` AND canTakeApprenticeship = '${canTakeApprenticeship}'`;
+    }
+
+    if (monthsOfCommercialExp !== undefined) {
+      filterQuery += ` AND monthsOfCommercialExp >= '${monthsOfCommercialExp}'`;
+    }
+
+    return filterQuery;
+  }
+
+  static filterRating(
+    courseCompletion: string,
+    courseEngagement: string,
+    projectDegree: string,
+    teamProjectDegree: string,
+  ): string {
+    let starRating = ' ';
+    const tab: FilterData[] = [
+      {
+        courseCompletion: courseCompletion,
+      },
+      {
+        courseEngagement: courseEngagement,
+      },
+      {
+        projectDegree: projectDegree,
+      },
+      {
+        teamProjectDegree: teamProjectDegree,
+      },
+    ];
+
+    tab.forEach((obj) => {
+      for (let key in obj) {
+        const value = obj[key];
+        if (value !== undefined) {
+          starRating += ` AND ${key} >= ${value}`;
+        }
+      }
+    });
+
+    return starRating;
+  }
+
+  static async getFilteredAll(data: any): Promise<StudentRecord[]> {
+    let query =
+      'SELECT `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE 1=1';
+    query += this.filterBySearch(data.search);
+    query += this.filterBy(
+      data.canTakeApprenticeship,
+      data.monthsOfCommercialExp,
+      data.expectedTypeWork,
+      data.expectedContractType,
+    );
+    query += this.filterByPayment(data.min, data.max);
+    query += this.filterRating(
+      data.courseCompletion,
+      data.courseEngagement,
+      data.projectDegree,
+      data.teamProjectDegree,
+    );
+    query += this.pagination(data.page, data.perPage);
+    const [results] = (await pool.execute(query)) as StudentRecordResult;
     return results;
   }
+}
 
    static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
 
@@ -189,3 +301,4 @@ export class StudentRecord implements StudentEntity {
      }
   }
 }
+
