@@ -2,7 +2,7 @@ import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
 import {Octokit} from "octokit";
 import {pool} from "../config/db";
-import {StudentEntity} from "../types";
+import { FilterData, StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
@@ -267,32 +267,37 @@ export class StudentRecord implements StudentEntity {
     const [results] = (await pool.execute(query)) as StudentRecordResult;
     return results;
   }
-}
+
 
    static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
 
-    let userStatus='';
-    let reservationExpiresOn:null|Date=null;
+    //active - 1
+     // reserved - 2
+     // hired - 3
+
+    let userStatus=0;
+    let reservationExpiresOn:null|Date;
     let message='';
     if (action === 'reserve') {
-      reservationExpiresOn = new Date();
-      userStatus = 'reserved'
+      const now = new Date();
+      reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+      userStatus = 2;
       message= 'Kursant został zarezerwowany';
     } else if (action === 'employ') {
       reservationExpiresOn = null;
-      userStatus = 'hired';
+      userStatus = 3;
       message= 'Kursant został zatrudniony';
       await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO do zastanowienia się jaki tekst ma być wysyłany
     } else if (action === 'disinterest'){
       reservationExpiresOn = null;
-      userStatus = 'active';
+      userStatus = 1;
       hrId=null;
       message= 'Zgłoszono brak zainteresowania kursantem'
     }
     else{
       throw new ValidationError('Nie udało się wykonać zmiany statusu');
     }
-
+     console.log(action,studentId,hrId);
     const [results] = await pool.execute("UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
      if (results) {
        return message;
