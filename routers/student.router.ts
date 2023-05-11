@@ -11,10 +11,10 @@ studentRouter
         res.json(studentsShortinfo);
     })
 
-    .post('/reserved', async (req, res) => {
-        const [] = req.body; //wartości filtrów
-        // post przyjmuje formularz z filtrami wybranymi przez użytkownika wylistowanie
-        // wszystkich zarezerwowanych kursantów + data z bazy + 10dni (makieta4)
+    .patch('/status', async (req, res) => {
+        const {action,studentId, hrId = null}:UpdateStatus = req.body;
+        const message = await StudentRecord.statusChange(action,studentId,hrId);
+        res.status(200).json({ success: true, message: message });;
     })
 
     
