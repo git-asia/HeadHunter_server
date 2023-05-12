@@ -2,7 +2,7 @@ import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
 import {Octokit} from "octokit";
 import {pool} from "../config/db";
-import {StudentEntity} from "../types";
+import { FilterData, StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
@@ -267,7 +267,6 @@ export class StudentRecord implements StudentEntity {
     const [results] = (await pool.execute(query)) as StudentRecordResult;
     return results;
   }
-}
 
    static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
 
