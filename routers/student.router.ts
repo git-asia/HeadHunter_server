@@ -1,13 +1,17 @@
-import {Request, Response, Router} from "express";
+import {Router} from "express";
 import {StudentRecord} from "../records/student.record";
+import { FilterRecord } from "../records/filter.record";
+
 
 export const studentRouter = Router();
 
 studentRouter
 
     .get('/all/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage', async (req, res) => {
-        console.log(req.params);
-        console.log('tutaj jestem');
+        const filter = req.params;
+        const availableStudents = new FilterRecord(filter);
+        const data = await availableStudents.get();
+        res.json(data);
 
     })
 
