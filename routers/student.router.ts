@@ -14,7 +14,7 @@ studentRouter
     .patch('/status', async (req, res) => {
         const {action,studentId, hrId = null}:UpdateStatus = req.body;
         const message = await StudentRecord.statusChange(action,studentId,hrId);
-        res.status(200).json({ success: true, message: message });;
+        res.status(200).json({ success: true, message: message });
     })
 
     
@@ -24,4 +24,11 @@ studentRouter
         // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
         // kursanta (makieta 6)
     })
+
+    .get('/test', (req, res) => {
+        res.send({
+        be: 'is working 🥳'
+        });
+    })
+
 
