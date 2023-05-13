@@ -1,5 +1,6 @@
 import {HrEntity} from "../types";
 import {ValidationError} from "../utils/errors";
+import { pool } from "../config/db";
 
 export class HrRecord implements HrEntity {
     hrId: string;
@@ -19,8 +20,15 @@ export class HrRecord implements HrEntity {
             throw new ValidationError("HR musi mieć ustalony limit w zakresie 1-999");
         }
 
+        this.hrId = obj.hrId;
         this.fullName = obj.fullName;
         this.company = obj.company;
         this.maxReservedStudents = obj.maxReservedStudents;
     }
+
+    async insert():Promise<void>{
+        await pool.execute("INSERT INTO `hrs`(`hrId`, `fullName`, `company`, `maxReservedStudents`) VALUES (:hrId, :fullName, :company, :maxReservedStudents)", this);
+
+    }
+
 }
