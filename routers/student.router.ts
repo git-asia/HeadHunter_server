@@ -28,8 +28,9 @@ studentRouter
 })
     
     .get('/getcv/:studentId', async (req, res) => {
-        const studentId = req.params.studentId
-
+        const studentId = req.params.studentId;
+        const data = await StudentRecord.getCvOneStudent(studentId);
+        res.json(data);
         // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
         // kursanta (makieta 6)
     })
@@ -37,8 +38,8 @@ studentRouter
     .patch('/changedata', async (req: Request, res: Response) => {
         const {studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls} = req.body;
 
-        await StudentRecord.updateData(studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls);
-        res.json(studentId);
+        const data: string = await StudentRecord.updateData(studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls);
+        res.json(data);
         }
     )
 
