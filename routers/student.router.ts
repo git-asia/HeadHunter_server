@@ -1,6 +1,5 @@
 import {Request, Response, Router} from "express";
 import {StudentRecord} from "../records/student.record";
-import {UserRecord} from "../records/user.record";
 
 export const studentRouter = Router();
 
@@ -8,8 +7,8 @@ studentRouter
 
     .get('/all', async (req, res) => {
         const {...data } = req.query;        
-        const studentsShortinfo = await StudentRecord.getFilteredAll(data);
-        res.json(studentsShortinfo);
+        //const studentsShortinfo = await StudentRecord.getFilteredAll(data);
+        //res.json(studentsShortinfo);
     })
 
     .patch('/status', async (req, res) => {
@@ -28,14 +27,8 @@ studentRouter
     })
 
     .patch('/changedata', async (req: Request, res: Response) => {
-        const {studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls} = req.body;
-
-        const data: string = await StudentRecord.updateData(studentId, firstName, lastName, phoneNumber, githubUsername, portfolioUrls, projectUrls, bio, expectedTypeWork, targetWorkCity, expectedContractType, expectedSalary, canTakeApprenticeship, monthsOfCommercialExp, education, workExperience, courses, bonusProjectUrls);
+        const newStudent = new StudentRecord(req.body);
+        const data = await newStudent.update();
         res.json(data);
         }
     )
-    .get('/test', (req, res) => {
-        res.send({
-        be: 'is working 🥳'
-        });
-    })
