@@ -8,4 +8,5 @@ import { userController } from '../controllers/controllers';
 // TOKEN W ZAPYTANIU TRZEBA WYSYŁAĆ W NAGŁÓWKU "Authorization"
 export const authRouter = Router();
 
-authRouter.post('/path-for-loggedIn-users', authMiddleware, userController)
+// representation of path accessible only for logged-in users
+authRouter.post('/path', authMiddleware, userController)
