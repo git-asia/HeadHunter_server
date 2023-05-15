@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {StudentRecord} from "../records/student.record";
 import { FilterRecord } from "../records/filter.record";
+import { UpdateStatus } from "../types";
 
 
 export const studentRouter = Router();
