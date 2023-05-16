@@ -16,15 +16,22 @@ app.use(cors({
 app.use(json());
 app.use(handleError);
 
-const router = Router();
 
-router.use('/user', userRouter);
-router.use('/student', studentRouter);
-router.use('/manage', adminRouter);
-router.use('/', homeRouter);
+app.use('/user', userRouter);
+app.use('/students', studentRouter);
+app.use('/manage', adminRouter);
+app.use('/', homeRouter);
 
-app.use('/app', router);
+//const router = Router();
+//app.use('/app', router);
+//router.use('/user', userRouter);
+//router.use('/student', studentRouter);
+//router.use('/manage', adminRouter);
+//router.use('/', homeRouter);
 
-app.listen(3001, '0.0.0.0', () => {
+
+
+
+app.listen(3001, 'localhost', () => {
   console.log('Listening on http://localhost:3001');
 });

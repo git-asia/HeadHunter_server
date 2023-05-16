@@ -133,12 +133,14 @@ export class UserRecord implements  UserEntity {
         });
     }
 
+
     static async updateEmail(id: string, email: string): Promise<void> {
         await pool.execute("UPDATE `users` SET `email` = :email WHERE `userId` = :id", {
             email,
             id,
         });
     }
+
 
     static async updateStudentStatus(studentId: string, userStatus: number): Promise<void> {
         await pool.execute("UPDATE `students` SET `userStatus` = :userStatus WHERE `studentId` = :studentId", {
