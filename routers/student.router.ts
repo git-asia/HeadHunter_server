@@ -19,7 +19,10 @@ studentRouter
 
     
     .get('/getcv/:studentId', async (req, res) => {
-        const studentId = req.params.studentId
+        const studentId = req.params.studentId;
+        console.log(studentId);
+        const data = await StudentRecord.getCvOneStudent(studentId);
+        res.json(data);
 
         // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
         // kursanta (makieta 6)

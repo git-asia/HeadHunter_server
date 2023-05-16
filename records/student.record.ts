@@ -299,5 +299,13 @@ export class StudentRecord implements StudentEntity {
        throw new ValidationError('Nie udało się wykonać zmiany statusu');
      }
   }
+
+
+  static async getCvOneStudent(id:string): Promise<StudentEntity[]> {
+    const [results] = await pool.execute("SELECT `firstName`, `lastName`, `githubUsername`, `phoneNumber`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship`, `monthsOfCommercialExp`, `bio`, `education`, `courses`, `workExperience`, `portfolioUrls`, `bonusProjectUrls`, `projectUrls`, `userStatus`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree` FROM `students` WHERE `studentId` = :id",{
+      id
+    }) as StudentRecordResult;
+    return results;
+  }
 }
 
