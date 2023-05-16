@@ -156,6 +156,7 @@ export class StudentRecord implements StudentEntity {
      // reserved - 2
      // hired - 3
 
+
     let userStatus=0;
     let reservationExpiresOn:null|Date;
     let message='';

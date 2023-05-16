@@ -1,3 +1,4 @@
+
 import {Router} from "express";
 import {StudentRecord} from "../records/student.record";
 import { FilterRecord } from "../records/filter.record";
@@ -32,7 +33,13 @@ studentRouter
     .get('/getcv/:studentId', async (req, res) => {
        // const studentId = req.params.studentId
 
-        // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
-        // kursanta (makieta 6)
-    })
 
+  // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
+  // kursanta (makieta 6)
+  //})
+
+  .get('/test', (req, res) => {
+    res.send({
+      be: 'is working 🥳',
+    });
+  });
