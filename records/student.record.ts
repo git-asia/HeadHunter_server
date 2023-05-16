@@ -2,7 +2,7 @@ import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
 import {Octokit} from "octokit";
 import {pool} from "../config/db";
-import { FilterData, StudentEntity } from "../types";
+import { StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
@@ -150,148 +150,36 @@ export class StudentRecord implements StudentEntity {
     this.reservationExpiresOn = obj.reservationExpiresOn;
   }
 
-  static pagination(page: number, perPage: number): string {
-    const quantity = page * perPage;
-    return ` LIMIT ${perPage} OFFSET ${quantity}`;
-  }
+    static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
 
-  static filterBySearch(search: string): string {
-    let searchQuery = ' ';
+    //active - 1
+     // reserved - 2
+     // hired - 3
 
-    if (search !== undefined) {
-      searchQuery += ` AND targetWorkCity LIKE '%${search}%'`;
-    }
-    return searchQuery;
-  }
 
-  static filterByPayment(min: string, max: string): string {
-    let paymentFilter = ' ';
-    if (min && max !== undefined) {
-      paymentFilter += ` AND expectedSalary BETWEEN ${min} AND ${max}`;
-    } else if (min !== undefined) {
-      paymentFilter += ` AND expectedSalary >= ${min}`;
-    } else if (max !== undefined) {
-      paymentFilter += ` AND expectedSalary <= ${max}`;
-    }
-
-    return paymentFilter;
-  }
-
-  static filterBy(
-    canTakeApprenticeship: string,
-    monthsOfCommercialExp: string,
-    expectedTypeWork: string,
-    expectedContractType: string,
-  ): string {
-    let filterQuery = ' ';
-    const tab: FilterData[] = [
-      {
-        expectedTypeWork: expectedTypeWork,
-      },
-      {
-        expectedContractType: expectedContractType,
-      },
-    ];
-    tab.forEach((obj) => {
-      for (let key in obj) {
-        const value = obj[key];
-        if (value !== undefined) {
-          filterQuery += ` AND`;
-          filterQuery += ` ${key} IN (${value.split('')})`;
-        }
-      }
-    });
-    if (canTakeApprenticeship !== undefined) {
-      filterQuery += ` AND canTakeApprenticeship = '${canTakeApprenticeship}'`;
-    }
-
-    if (monthsOfCommercialExp !== undefined) {
-      filterQuery += ` AND monthsOfCommercialExp >= '${monthsOfCommercialExp}'`;
-    }
-
-    return filterQuery;
-  }
-
-  static filterRating(
-    courseCompletion: string,
-    courseEngagement: string,
-    projectDegree: string,
-    teamProjectDegree: string,
-  ): string {
-    let starRating = ' ';
-    const tab: FilterData[] = [
-      {
-        courseCompletion: courseCompletion,
-      },
-      {
-        courseEngagement: courseEngagement,
-      },
-      {
-        projectDegree: projectDegree,
-      },
-      {
-        teamProjectDegree: teamProjectDegree,
-      },
-    ];
-
-    tab.forEach((obj) => {
-      for (let key in obj) {
-        const value = obj[key];
-        if (value !== undefined) {
-          starRating += ` AND ${key} >= ${value}`;
-        }
-      }
-    });
-
-    return starRating;
-  }
-
-  static async getFilteredAll(data: any): Promise<StudentRecord[]> {
-    let query =
-      'SELECT `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`,`teamProjectDegree`,`expectedTypeWork`,`targetWorkCity`,`expectedContractType`,`expectedSalary`,`canTakeApprenticeship`,`monthsOfCommercialExp` FROM `students` WHERE 1=1';
-    query += this.filterBySearch(data.search);
-    query += this.filterBy(
-      data.canTakeApprenticeship,
-      data.monthsOfCommercialExp,
-      data.expectedTypeWork,
-      data.expectedContractType,
-    );
-    query += this.filterByPayment(data.min, data.max);
-    query += this.filterRating(
-      data.courseCompletion,
-      data.courseEngagement,
-      data.projectDegree,
-      data.teamProjectDegree,
-    );
-    query += this.pagination(data.page, data.perPage);
-    const [results] = (await pool.execute(query)) as StudentRecordResult;
-    return results;
-  }
-
-   static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
-
-    let userStatus='';
-    let reservationExpiresOn:null|Date=null;
+    let userStatus=0;
+    let reservationExpiresOn:null|Date;
     let message='';
     if (action === 'reserve') {
-      reservationExpiresOn = new Date();
-      userStatus = 'reserved'
+      const now = new Date();
+      reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
+      userStatus = 2;
       message= 'Kursant został zarezerwowany';
     } else if (action === 'employ') {
       reservationExpiresOn = null;
-      userStatus = 'hired';
+      userStatus = 3;
       message= 'Kursant został zatrudniony';
       await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO do zastanowienia się jaki tekst ma być wysyłany
     } else if (action === 'disinterest'){
       reservationExpiresOn = null;
-      userStatus = 'active';
+      userStatus = 1;
       hrId=null;
       message= 'Zgłoszono brak zainteresowania kursantem'
     }
     else{
       throw new ValidationError('Nie udało się wykonać zmiany statusu');
     }
-
+     console.log(action,studentId,hrId);
     const [results] = await pool.execute("UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
      if (results) {
        return message;
