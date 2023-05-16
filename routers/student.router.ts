@@ -31,15 +31,18 @@ studentRouter
 })
     
     .get('/getcv/:studentId', async (req, res) => {
-       // const studentId = req.params.studentId
 
+        const studentId = req.params.studentId;
+        const data = await StudentRecord.getCvOneStudent(studentId);
+        res.json(data);
+        // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
+        // kursanta (makieta 6)
+    })
 
-  // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
-  // kursanta (makieta 6)
-  })
+    .patch('/changedata', async (req: Request, res: Response) => {
+        const newStudent = new StudentRecord(req.body);
+        const data = await newStudent.update();
+        res.json(data);
+        }
+    )
 
-  .get('/test', (req, res) => {
-    res.send({
-      be: 'is working 🥳',
-    });
-  });
