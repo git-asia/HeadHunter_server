@@ -83,9 +83,14 @@ userRouter
 
     .patch("/changemail", async (req: Request, res: Response) => {
         const {id, email} = req.body;
+        const isEmail = await UserRecord.checkEmail(email);
+
+        if(isEmail!==null){
+            throw new ValidationError("Taki e-mail już istnieje w systemie")
+        }
 
         if (!email.includes('@')) {
-            throw new ValidationError('HTo nie jest poprawny adres e-mail');
+            throw new ValidationError('To nie jest poprawny adres e-mail');
         }
         await UserRecord.updateEmail(id, email);
         res.json(true);
