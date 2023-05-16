@@ -36,7 +36,7 @@ studentRouter
 
   // wymaga id studenta i zwraca wszystkie dane wymagane do wyświetlenia cv
   // kursanta (makieta 6)
-  //})
+  })
 
   .get('/test', (req, res) => {
     res.send({
