@@ -1,6 +1,6 @@
 export const smtpConfig =
   {
-    host: "sandbox.smtp.mailtrap.ioss",
+    host: "sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
       user: "b475528c3669e1",
