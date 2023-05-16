@@ -38,9 +38,8 @@ export interface StudentEntity extends ReservedStudent{
 }
 
 
-export interface FilterData {
-  [key: string]: string | undefined;
-}
 export interface SingleStudent extends Omit<StudentEntity, 'reservationExpiresOn' | 'reservedBy' | 'userStatus'> {
   email: string;
 }
+
+
