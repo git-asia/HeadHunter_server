@@ -29,7 +29,7 @@ router.use('/student', studentRouter);
 router.use('/manage', adminRouter);
 router.use('/', homeRouter);
 
-app.use('/public_nodejs', router);
+app.use('/app', router);
 
 app.listen(3001, '0.0.0.0', () => {
   console.log('Listening on http://localhost:3001');
