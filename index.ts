@@ -6,11 +6,12 @@ import {homeRouter} from "./routers/home.router";
 import {studentRouter} from "./routers/student.router";
 import {userRouter} from "./routers/user.router";
 import {handleError} from "./utils/errors";
+import {config} from "./config/config";
 
 const app = express();
 
 app.use(cors({
-    origin: 'http://127.0.0.1:5173' }));
+    origin: config.corsOrigin }));
 
 app.use(json());
 app.use(handleError);
