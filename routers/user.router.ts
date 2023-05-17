@@ -45,8 +45,9 @@ userRouter
     })
 
     .post('/my-status', async (req, res) => {
-        const studentId = req.body
-
+        const {studentId, userStatus} = req.body;
+        await UserRecord.updateStudentStatus(studentId, userStatus);
+        res.json(true);
         // przyjmuje dane o statusie (zatrudniony lub nie)  i  wprowadza zmiany w bazie
     })
 
@@ -82,6 +83,21 @@ userRouter
         }
         const hashPassword = await hash(pass, 10);
         await UserRecord.updatePassword(id, hashPassword);
-        res.json(id);
+        res.json(true);
+    })
+
+    .patch("/changemail", async (req: Request, res: Response) => {
+        const {id, email} = req.body;
+        const isEmail = await UserRecord.checkEmail(email);
+
+        if(isEmail!==null){
+            throw new ValidationError("Taki e-mail już istnieje w systemie")
+        }
+
+        if (!email.includes('@')) {
+            throw new ValidationError('To nie jest poprawny adres e-mail');
+        }
+        await UserRecord.updateEmail(id, email);
+        res.json(true);
     });
 
