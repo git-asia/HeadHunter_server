@@ -56,6 +56,11 @@ userRouter
         res.json(userId);
     })
 
+    .get("/getemail/:id", async (req: Request, res: Response) => {
+        const userEmail: string = await UserRecord.getEmail(req.params.id);
+        res.json(userEmail);
+    })
+
     .get("/email/:email", async (req: Request, res: Response) => {
         const userId: string | null = await UserRecord.checkEmail(req.params.email);
         if (userId === null) {

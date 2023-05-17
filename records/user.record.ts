@@ -60,7 +60,7 @@ export class UserRecord implements  UserEntity {
     }
 
     async getOne(email: string): Promise<UserEntity | null> {
-        const [results] = await pool.execute("SELECT * FROM `users` WHERE email=:email", { email }) as UserRecordResult;
+        const [results] = await pool.execute("SELECT * FROM `users` WHERE `email`=:email", { email }) as UserRecordResult;
         return results.length === 0 ? null : new UserRecord(results[0] as UserEntity)
 
     }
@@ -147,5 +147,10 @@ export class UserRecord implements  UserEntity {
             studentId,
             userStatus,
         });
+    }
+
+    static async getEmail(id: string): Promise<string> {
+        const [results] = await pool.execute("SELECT `email` FROM `users` WHERE `userId`=:id", { id }) as UserRecordResult;
+        return results[0].email;
     }
 }

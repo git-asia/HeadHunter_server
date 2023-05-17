@@ -31,7 +31,6 @@ studentRouter
 })
     
     .get('/getcv/:studentId', async (req, res) => {
-
         const studentId = req.params.studentId;
         const data = await StudentRecord.getCvOneStudent(studentId);
         res.json(data);
@@ -45,4 +44,3 @@ studentRouter
         res.json(data);
         }
     )
-
