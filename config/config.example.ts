@@ -3,5 +3,7 @@
 //   dbUser: 'root',
 //   dbPassword: 'password',
 //   dbDatabase: 'db_name',
-//   corsOrigin: 'http://localhost:3000',
+//   dbPort: 8889,
+//   dbSocket: '/Applications/MAMP/tmp/mysql/mysql.sock',
+//   corsOrigin: 'http://localhost:5173',
 // };
