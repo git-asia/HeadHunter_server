@@ -4,4 +4,5 @@ export const config = {
   dbPassword: process.env.DB_PASSWORD,
   dbDatabase: process.env.DB_NAME,
   corsOrigin: process.env.CORS_ORIGIN,
+  dbPort: process.env.DB_PORT,
 };
