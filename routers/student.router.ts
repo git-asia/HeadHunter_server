@@ -13,7 +13,13 @@ studentRouter
         const filter = req.params;
         const availableStudents = new FilterRecord(filter);
         const data = await availableStudents.get();
-        res.json(data);
+        const allRecords = await availableStudents.allRecordsStudent();
+        const newData = {
+          allRecords: allRecords,
+          data: data,
+        }
+
+        res.json(newData);
 
     })
 
@@ -23,13 +29,6 @@ studentRouter
         res.status(200).json({ success: true, message: message });
     })
 
-    .get('/short/:studentId', async (req, res) => {
-//     const studentsShortinfo = await StudentRecord.studentShortInfo(
-//         req.params.studentId
-//     );
-//     res.json(studentsShortinfo[0]);
-})
-    
     .get('/getcv/:studentId', async (req, res) => {
         const studentId = req.params.studentId;
         const data = await StudentRecord.getCvOneStudent(studentId);
@@ -38,7 +37,7 @@ studentRouter
         // kursanta (makieta 6)
     })
 
-    .patch('/changedata', async (req: Request, res: Response) => {
+    .patch('/changedata', async (req, res) => {
         const newStudent = new StudentRecord(req.body);
         const data = await newStudent.update();
         res.json(data);

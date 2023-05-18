@@ -27,5 +27,3 @@ export const sendMail = (mail:string,subject:string, text:string, html:string=''
 
 
 }
-
-

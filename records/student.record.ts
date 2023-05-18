@@ -1,6 +1,6 @@
 import {FieldPacket} from "mysql2";
 import {ValidationError} from "../utils/errors";
-import {Octokit} from "octokit";
+import {Octokit} from "@octokit/core";
 import {pool} from "../config/db";
 import { StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
@@ -165,12 +165,13 @@ export class StudentRecord implements StudentEntity {
     //active - 1
      // reserved - 2
      // hired - 3
-
-
     let userStatus=0;
     let reservationExpiresOn:null|Date;
     let message='';
     if (action === 'reserve') {
+      const [results] = await pool.execute("SELECT * FROM `students` WHERE `studentId`=:studentId AND `userStatus`=2",{studentId} );
+      if(results) throw new ValidationError('Student został już zarezerwowany');
+      console.log(results);
       const now = new Date();
       reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
       userStatus = 2;
@@ -189,7 +190,7 @@ export class StudentRecord implements StudentEntity {
     else{
       throw new ValidationError('Nie udało się wykonać zmiany statusu');
     }
-     console.log(action,studentId,hrId);
+
     const [results] = await pool.execute("UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
      if (results) {
        return message;

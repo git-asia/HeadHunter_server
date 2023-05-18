@@ -4,6 +4,7 @@ import { FieldPacket } from "mysql2";
 
 
 type AvailableStudentResults = [AvailableStudent[], FieldPacket[]]
+type AllRecordsStudentResults = [{totalCount:number}[],FieldPacket[]]
 
 export class FilterRecord implements FilterEntity{
     remoteWork: boolean|string;
@@ -72,7 +73,6 @@ export class FilterRecord implements FilterEntity{
         this.page = Number(this.page);
         this.rowsPerPage = Number(this.rowsPerPage);
         this.page = this.page * this.rowsPerPage;
-        console.log(query);
         return query;
     }
 
@@ -82,11 +82,19 @@ export class FilterRecord implements FilterEntity{
           query +
           "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
-
         return results.length === 0 ? null : results;
     }
-
+    async allRecordsStudent(){
+        const query = this.change();
+        const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE " +
+          query +
+          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree" , this) as AllRecordsStudentResults;
+        return results.length === 0 ? null : results[0].totalCount
+    }
 }
+
+
 
 
 
