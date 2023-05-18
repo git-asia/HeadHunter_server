@@ -8,5 +8,5 @@ export const pool = createPool({
     database: config.dbDatabase,
     namedPlaceholders: true,
     decimalNumbers: true,
-    bdPort: config.dbPort,
+    port: config.dbPort,
 })
