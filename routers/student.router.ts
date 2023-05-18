@@ -23,13 +23,6 @@ studentRouter
         res.status(200).json({ success: true, message: message });
     })
 
-    .get('/short/:studentId', async (req, res) => {
-//     const studentsShortinfo = await StudentRecord.studentShortInfo(
-//         req.params.studentId
-//     );
-//     res.json(studentsShortinfo[0]);
-})
-    
     .get('/getcv/:studentId', async (req, res) => {
 
         const studentId = req.params.studentId;
@@ -39,7 +32,7 @@ studentRouter
         // kursanta (makieta 6)
     })
 
-    .patch('/changedata', async (req: Request, res: Response) => {
+    .patch('/changedata', async (req, res) => {
         const newStudent = new StudentRecord(req.body);
         const data = await newStudent.update();
         res.json(data);
