@@ -13,7 +13,13 @@ studentRouter
         const filter = req.params;
         const availableStudents = new FilterRecord(filter);
         const data = await availableStudents.get();
-        res.json(data);
+        const allRecords = await availableStudents.allRecordsStudent();
+        const newData = {
+          allRecords: allRecords,
+          data: data,
+        }
+
+        res.json(newData);
 
     })
 
