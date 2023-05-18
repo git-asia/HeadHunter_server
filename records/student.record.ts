@@ -153,7 +153,7 @@ export class StudentRecord implements StudentEntity {
   }
 
 
-  static async getCvOneStudent(id:string): Promise<StudentEntity[]> {
+  static async getCvOneStudentEdit(id:string): Promise<StudentEntity[]> {
     const [results] = await pool.execute("SELECT `firstName`, `lastName`, `githubUsername`, `phoneNumber`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship`, `monthsOfCommercialExp`, `bio`, `education`, `courses`, `workExperience`, `portfolioUrls`, `bonusProjectUrls`, `projectUrls` FROM `students` WHERE `studentId` = :id",{
       id
     }) as StudentRecordResult;
@@ -206,7 +206,6 @@ export class StudentRecord implements StudentEntity {
     }) as StudentRecordResult;
     return results;
   }
-}
 
 
   async update(): Promise<string> {
