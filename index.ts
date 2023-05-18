@@ -22,7 +22,7 @@ app.use('/user', userRouter);
 app.use('/students', studentRouter);
 app.use('/manage', adminRouter);
 app.use('/', homeRouter);
-app.use('/test-jtw', authRouter)
+app.use('/auth', authRouter)
 
 app.listen(3001, '0.0.0.0', () => {
     console.log('Listening on http://localhost:3001');

@@ -9,4 +9,4 @@ import { userController } from '../controllers/controllers';
 export const authRouter = Router();
 
 // representation of path accessible only for logged-in users
-authRouter.post('/path', authMiddleware, userController)
+authRouter.post('/decode-token', authMiddleware, userController)

@@ -7,6 +7,6 @@ import jwt from 'jsonwebtoken';
 export const userController = async (req: Request, res: Response) => {
     //POBRANIE ZDEKODOWANEJ WARTOSCI (MAILA) Z TOKENU I SPRAWDZENIE CZY UZYTKOWNIK Z TAKIM MAILEM ISTNIEJE
     const { email } = req.user as { email: string };
-    const { email: userEmail } = await UserRecord.getOne(email);
-    res.json({ userEmail })
+    const { email: userEmail, userState, userId } = await UserRecord.getOne(email);
+    res.json({ userEmail, userId, userState })
 }
