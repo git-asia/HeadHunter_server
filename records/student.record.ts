@@ -165,8 +165,6 @@ export class StudentRecord implements StudentEntity {
     //active - 1
      // reserved - 2
      // hired - 3
-
-
     let userStatus=0;
     let reservationExpiresOn:null|Date;
     let message='';
@@ -192,7 +190,7 @@ export class StudentRecord implements StudentEntity {
     else{
       throw new ValidationError('Nie udało się wykonać zmiany statusu');
     }
-     console.log(action,studentId,hrId);
+
     const [results] = await pool.execute("UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId",{hrId, userStatus, reservationExpiresOn, studentId})
      if (results) {
        return message;
