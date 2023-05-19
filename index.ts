@@ -27,6 +27,6 @@ app.use('/', homeRouter);
 app.use('/auth', authRouter)
 
 
-app.listen(3001, 'localhost', () => {
+app.listen(port, "0.0.0.0", () => {
   console.log('Listening on http://localhost:3001');
 });
