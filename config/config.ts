@@ -6,4 +6,5 @@ export const config = {
   dbPort: process.env.MYSQLPORT,
   sqlUrl: process.env.MYSQL_URL,
   corsOrigin: process.env.CORS_ORIGIN,
+  appPort: process.env.PORT || 3001,
 };
