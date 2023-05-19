@@ -7,7 +7,5 @@ export const pool = createPool({
   password: config.dbPassword,
   database: config.dbDatabase,
   port: config.dbPort,
-  namedPlaceholders: true,
-  decimalNumbers: true,
 });
 
