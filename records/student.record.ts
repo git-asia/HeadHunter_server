@@ -42,7 +42,7 @@ export class StudentRecord implements StudentEntity {
   targetWorkCity: string;
   expectedContractType: number;
   expectedSalary: number;
-  canTakeApprenticeship: boolean;
+  canTakeApprenticeship: boolean|number;
   monthsOfCommercialExp: number;
   education: string | null;
   workExperience: string | null;
