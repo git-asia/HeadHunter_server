@@ -84,12 +84,12 @@ export class FilterRecord implements FilterEntity{
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
         return results.length === 0 ? null : results;
     }
-    async allRecordsStudent(){
+    async allRecordsStudent():Promise<number>| null{
         const query = this.change();
         const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE " +
           query +
           "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree" , this) as AllRecordsStudentResults;
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree" , this) as [{totalCount:number}[]];
         return results.length === 0 ? null : results[0].totalCount
     }
 }
