@@ -87,7 +87,7 @@ export class UserRecord implements  UserEntity {
             token,
         })) as RegistrationTokenResult;
         if (results.length === 0) {
-            throw new ValidationError('Nie ma takiego tokena');
+            return('Błąd: brak tokena!');
         }
         return (results[0].tokenExpiresOn).getTime() < Date.now() ? null : results[0].userId;
     }
