@@ -1,4 +1,4 @@
-import express, { json, Router } from "express";
+import express, { json } from 'express';
 import cors from 'cors';
 import 'express-async-errors';
 import {adminRouter} from "./routers/admin.router";
@@ -11,8 +11,11 @@ import { authRouter } from './routers/auth.router';
 
 const app = express();
 
-app.use(cors({
-    origin: config.corsOrigin }));
+app.use(
+  cors({
+    origin: config.corsOrigin,
+  }),
+);
 
 app.use(json());
 app.use(handleError);
