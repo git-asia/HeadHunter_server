@@ -7,36 +7,32 @@ export const studentRouter = Router();
 
 studentRouter
 
-  .get(
-    '/all/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage',
-    async (req, res) => {
-      const filter = req.params;
-      const availableStudents = new FilterRecord(filter);
-      const data = await availableStudents.get();
-      const allRecords = await availableStudents.allRecordsStudent();
-      const newData = {
-        allRecords: allRecords,
-        data: data,
-      };
 
-      res.json(newData);
-    },
-  )
-  .get(
-    '/reserved/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage/:hrId',
-    async (req, res) => {
-      const filter = req.params;
-      const availableStudents = new FilterRecord(filter);
-      const data = await availableStudents.getReserved();
-      const allRecords = await availableStudents.allRecordsReservedStudent();
-      const newData = {
-        allRecords: allRecords,
-        data: data,
-      };
-      console.log(newData);
-      res.json(newData);
-    },
-  )
+    .get('/all/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage', async (req, res) => {
+        const filter = req.params;
+        const availableStudents = new FilterRecord(filter);
+        const data = await availableStudents.get();
+        const allRecords = await availableStudents.allRecordsStudent();
+        const newData = {
+          allRecords: allRecords,
+          data: data,
+        }
+
+        res.json(newData);
+    })
+      .get('/reserved/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage/:hrId', async (req, res) => {
+        const filter = req.params;
+        const availableStudents = new FilterRecord(filter);
+        const data = await availableStudents.getReserved();
+        const allRecords = await availableStudents.allRecordsReservedStudent();
+        const newData = {
+          allRecords: allRecords,
+          data: data,
+        }
+        console.log(newData);
+        res.json(newData);
+      })
+
 
   .patch('/status', async (req, res) => {
     const { action, studentId, hrId = null }: UpdateStatus = req.body;

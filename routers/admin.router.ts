@@ -35,15 +35,15 @@ adminRouter
   })
 
 
-    .get('/list-students', async (req, res) => {
-        // wylistowanie wszystkich dostępnych kursantów
-    })
+  .get('/list-students', async (req, res) => {
+    // wylistowanie wszystkich dostępnych kursantów
+  })
 
-    .get('/list-hrs', async (req, res) => {
-        // wylistowanie wszystkich dostępnych użytkowników hr 
-    })
+  .get('/list-hrs', async (req, res) => {
+    // wylistowanie wszystkich dostępnych użytkowników hr
+  })
 
-    .post('/register', async (req, res) => {
+  .post('/register', async (req, res) => {
 
-        // dodanie nowych użytkowników
-      })
+    // dodanie nowych użytkowników
+  })

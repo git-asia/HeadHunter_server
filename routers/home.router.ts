@@ -1,8 +1,8 @@
-import {Router} from "express";
+import { Router } from 'express';
 
 export const homeRouter = Router();
 
 homeRouter
-  .get('/', (req, res) => {
-      res.redirect('/students/all');
-  });
+    .get('/', (req, res) => {
+        res.redirect('/students/all');
+    });
