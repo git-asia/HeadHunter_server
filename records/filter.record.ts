@@ -3,8 +3,8 @@ import { AvailableStudent, FilterEntity } from "../types";
 import { FieldPacket } from "mysql2";
 
 
-type AvailableStudentResults = [AvailableStudent[], FieldPacket[]]
-type AllRecordsStudentResults = [{totalCount:number}[],FieldPacket[]]
+type AvailableStudentResults = [AvailableStudent[], FieldPacket[]];
+type AllRecordsStudentResults = [{totalCount:number}[],FieldPacket[]];
 
 export class FilterRecord implements FilterEntity{
     remoteWork: boolean|string;
@@ -23,6 +23,7 @@ export class FilterRecord implements FilterEntity{
     teamProjectDegree: string|number;
     page: string|number;
     rowsPerPage : string|number;
+    hrId?: string;
 
     constructor(obj:FilterEntity) {
         //@TODO można dodać walidacje danych
@@ -42,6 +43,7 @@ export class FilterRecord implements FilterEntity{
         this.teamProjectDegree = obj.teamProjectDegree;
         this.page = obj.page;
         this.rowsPerPage = obj.rowsPerPage;
+        this.hrId=obj.hrId;
     }
 
     change(){
@@ -81,15 +83,35 @@ export class FilterRecord implements FilterEntity{
         const [results] = await pool.execute("SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`  FROM `students` WHERE " +
           query +
           "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
         return results.length === 0 ? null : results;
     }
+
     async allRecordsStudent():Promise<number>| null{
         const query = this.change();
         const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE " +
           query +
           "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree" , this) as [{totalCount:number}[]];
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2'"  , this) as AllRecordsStudentResults;
+        return results.length === 0 ? null : results[0].totalCount
+    }
+
+    async getReserved():Promise<AvailableStudent[] | null>{
+        const query = this.change();
+        const [results] = await pool.execute("SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`, `githubUsername`, `reservationExpiresOn`  FROM `students` WHERE " +
+          query +
+          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
+
+        return results.length === 0 ? null : results;
+    }
+    async allRecordsReservedStudent():Promise<number>| null{
+        const query = this.change();
+        const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount` FROM `students` WHERE " +
+          query +
+          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AllRecordsStudentResults;
+
         return results.length === 0 ? null : results[0].totalCount
     }
 }

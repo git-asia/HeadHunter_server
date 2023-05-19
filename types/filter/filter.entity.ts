@@ -15,4 +15,5 @@ export interface FilterEntity {
   teamProjectDegree: string|number,
   page: string|number,
   rowsPerPage : string|number,
+  hrId?:string,
 }
