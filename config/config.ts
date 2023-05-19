@@ -1,8 +1,9 @@
 export const config = {
-  dbHost: process.env.DB_HOST || 'localhost',
-  dbUser: process.env.DB_USER,
-  dbPassword: process.env.DB_PASSWORD,
-  dbDatabase: process.env.DB_NAME,
-  dbPort: process.env.DB_PORT,
+  dbHost: process.env.MYSQLHOST || 'localhost',
+  dbUser: process.env.MYSQLUSER,
+  dbPassword: process.env.MYSQLPASSWORD,
+  dbDatabase: process.env.MYSQLDATABASE,
+  dbPort: process.env.MYSQLPORT,
+  sqlUrl: process.env.MYSQL_URL,
   corsOrigin: process.env.CORS_ORIGIN,
 };
