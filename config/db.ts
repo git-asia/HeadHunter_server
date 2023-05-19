@@ -29,9 +29,6 @@ export const pool = createPool({
 })();
 
 // Use the connection pool for executing queries
-
-// Use the connection pool for executing queries
-// Example:
 (async () => {
   let connection: PoolConnection | null = null;
   try {
