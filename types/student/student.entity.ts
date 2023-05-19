@@ -5,7 +5,7 @@ export interface FilterStudent{
   projectDegree: number;
   expectedTypeWork: number;
   expectedContractType: number;
-  canTakeApprenticeship:boolean;
+  canTakeApprenticeship:boolean | number;
   expectedSalaryMin: number;
   expectedSalaryMax: number;
   monthsOfCommercialExp: number;
