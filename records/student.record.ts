@@ -4,11 +4,10 @@ import {Octokit} from "@octokit/core";
 import {pool} from "../config/db";
 import { StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
-import {open} from "fs/promises";
+import { open } from "fs/promises";
+import { unlink } from 'node:fs';
 import {UserRecord} from "./user.record";
 import { v4 as uuid } from 'uuid';
-
-const { readFile, appendFile } = require('fs/promises');
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -65,7 +64,7 @@ export class StudentRecord implements StudentEntity {
 
     if(!obj.studentId){
 
-      if (checkGithubUsername(this.githubUsername) !== null) {
+      if ((checkGithubUsername(this.githubUsername) !== null)&&(this.githubUsername!=="")) {
         throw new ValidationError("Taki użytkownik GitHuba już istnieje");
       }
     }
@@ -221,10 +220,12 @@ export class StudentRecord implements StudentEntity {
   static async addNewStudent(): Promise<void> {
     const FILE_NAME = './utils/download/data21.csv';
     const newStudentsData = [];
+    let file;
     try {
-      const data = await open(FILE_NAME);
-      for await (const line of data.readLines()) {
-        const emailThisLine = line.split(',')[0];
+      file = await open(FILE_NAME);
+      for await (const line of file.readLines()) {
+        const lineValue = line.split(',');
+        const emailThisLine = lineValue[0];
         if (await UserRecord.checkEmail(emailThisLine)===null){
           const userId = uuid();
           await pool.execute("INSERT INTO `users`(`email`, `userId`) VALUES (:email, :userId)", {
@@ -233,13 +234,27 @@ export class StudentRecord implements StudentEntity {
           });
           await UserRecord.addToken(userId);
 
+          await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree)", {
+            userId,
+            bonusProjectUrls: lineValue[5],
+            courseCompletion: lineValue[1],
+            courseEngagement: lineValue[2],
+            projectDegree: lineValue[3],
+            teamProjectDegree: lineValue[4],
+          });
           newStudentsData.push(line);
         }
-
       }
     } catch (e) {
       console.log(e);
+    } finally {
+      await file?.close();
+      unlink(FILE_NAME, (err) => {
+        if (err) throw err;
+        console.log(`${FILE_NAME} was deleted`);
+      });
     }
+
     console.log(newStudentsData);
   }
 }
