@@ -239,13 +239,14 @@ export class StudentRecord implements StudentEntity {
           });
           await UserRecord.addToken(userId);
 
-          await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree)", {
+          await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `githubUsername`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree, :githubUsername)", {
             userId,
             bonusProjectUrls,
             courseCompletion,
             courseEngagement,
             projectDegree,
             teamProjectDegree: lineValue[4],
+            githubUsername: null
           });
           newStudentsData.push(line);
         }
