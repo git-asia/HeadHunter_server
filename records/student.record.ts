@@ -226,7 +226,12 @@ export class StudentRecord implements StudentEntity {
       for await (const line of file.readLines()) {
         const lineValue = line.split(',');
         const emailThisLine = lineValue[0];
-        if (await UserRecord.checkEmail(emailThisLine)===null){
+        const bonusProjectUrls = parseInt(lineValue[1]);
+        const courseCompletion = parseInt(lineValue[2]);
+        const courseEngagement = parseInt(lineValue[3]);
+        const projectDegree = parseInt(lineValue[4]);
+        const validation = (emailThisLine.includes('@'))&&(bonusProjectUrls>0)&&(bonusProjectUrls<6)&&(courseCompletion>0)&&(courseCompletion<6)&&(courseEngagement>0)&&(courseEngagement<6)&&(projectDegree>0)&&(projectDegree<6);
+        if ((await UserRecord.checkEmail(emailThisLine)===null)&&validation){
           const userId = uuid();
           await pool.execute("INSERT INTO `users`(`email`, `userId`) VALUES (:email, :userId)", {
             email: emailThisLine,
@@ -236,10 +241,10 @@ export class StudentRecord implements StudentEntity {
 
           await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree)", {
             userId,
-            bonusProjectUrls: lineValue[5],
-            courseCompletion: lineValue[1],
-            courseEngagement: lineValue[2],
-            projectDegree: lineValue[3],
+            bonusProjectUrls,
+            courseCompletion,
+            courseEngagement,
+            projectDegree,
             teamProjectDegree: lineValue[4],
           });
           newStudentsData.push(line);
@@ -251,7 +256,6 @@ export class StudentRecord implements StudentEntity {
       await file?.close();
       unlink(FILE_NAME, (err) => {
         if (err) throw err;
-        console.log(`${FILE_NAME} was deleted`);
       });
     }
   }
