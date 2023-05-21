@@ -4,6 +4,11 @@ import {Octokit} from "@octokit/core";
 import {pool} from "../config/db";
 import { StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
+import {open} from "fs/promises";
+import {UserRecord} from "./user.record";
+import { v4 as uuid } from 'uuid';
+
+const { readFile, appendFile } = require('fs/promises');
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -211,5 +216,30 @@ export class StudentRecord implements StudentEntity {
   async update(): Promise<string> {
     await pool.execute("UPDATE `students` SET `firstName` = :firstName, `lastName` = :lastName, `phoneNumber` = :phoneNumber, `githubUsername` = :githubUsername, `portfolioUrls` = :portfolioUrls, `projectUrls` = :projectUrls, `bio` = :bio, `expectedTypeWork` = :expectedTypeWork, `targetWorkCity` = :targetWorkCity, `expectedContractType` = :expectedContractType, `expectedSalary` = :expectedSalary, `canTakeApprenticeship` = :canTakeApprenticeship, `monthsOfCommercialExp` = :monthsOfCommercialExp, `education` = :education, `workExperience` = :workExperience, `courses` = :courses, `bonusProjectUrls` = :bonusProjectUrls WHERE `studentId` = :studentId", this);
     return this.studentId;
+  }
+
+  static async addNewStudent(): Promise<void> {
+    const FILE_NAME = './utils/download/data21.csv';
+    const newStudentsData = [];
+    try {
+      const data = await open(FILE_NAME);
+      for await (const line of data.readLines()) {
+        const emailThisLine = line.split(',')[0];
+        if (await UserRecord.checkEmail(emailThisLine)===null){
+          const userId = uuid();
+          await pool.execute("INSERT INTO `users`(`email`, `userId`) VALUES (:email, :userId)", {
+            email: emailThisLine,
+            userId
+          });
+          await UserRecord.addToken(userId);
+
+          newStudentsData.push(line);
+        }
+
+      }
+    } catch (e) {
+      console.log(e);
+    }
+    console.log(newStudentsData);
   }
 }

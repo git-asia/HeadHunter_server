@@ -66,4 +66,9 @@ studentRouter
     res.send({
       be: 'is working 🥳',
     });
-  });
+  })
+    .get('/newstudent', async (req, res) => {
+        await StudentRecord.addNewStudent();
+        res.json('link nadal dziala');
+    })
+;
