@@ -217,8 +217,8 @@ export class StudentRecord implements StudentEntity {
     return this.studentId;
   }
 
-  static async addNewStudent(): Promise<void> {
-    const FILE_NAME = './utils/download/data21.csv';
+  static async addNewStudent(fileName: string): Promise<void> {
+    const FILE_NAME = `./utils/download/${fileName}`;
     const newStudentsData = [];
     let file;
     try {
@@ -254,7 +254,5 @@ export class StudentRecord implements StudentEntity {
         console.log(`${FILE_NAME} was deleted`);
       });
     }
-
-    console.log(newStudentsData);
   }
 }

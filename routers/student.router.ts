@@ -2,6 +2,9 @@ import { Router } from 'express';
 import { StudentRecord } from '../records/student.record';
 import { FilterRecord } from '../records/filter.record';
 import { UpdateStatus } from '../types';
+import multer from "multer";
+
+const upload = multer({ dest: './utils/download/' })
 
 export const studentRouter = Router();
 
@@ -67,8 +70,7 @@ studentRouter
       be: 'is working 🥳',
     });
   })
-    .get('/newstudent', async (req, res) => {
-        await StudentRecord.addNewStudent();
-        res.json('link nadal dziala');
-    })
-;
+    .post('/newstudents', upload.single('dataFile'), async (req, res, next) => {
+        await StudentRecord.addNewStudent(req.file.filename);
+        res.status(200).json({ success: true, message: "Kursanci zostali dodani" });
+})
