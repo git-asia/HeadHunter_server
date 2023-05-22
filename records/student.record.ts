@@ -219,7 +219,6 @@ export class StudentRecord implements StudentEntity {
 
   static async addNewStudent(fileName: string): Promise<void> {
     const FILE_NAME = `./utils/download/${fileName}`;
-    const newStudentsData = [];
     let file;
     try {
       file = await open(FILE_NAME);
@@ -237,7 +236,7 @@ export class StudentRecord implements StudentEntity {
             email: emailThisLine,
             userId
           });
-          await UserRecord.addToken(userId);
+          const newToken: string = await UserRecord.addToken(userId);
 
           await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `githubUsername`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree, :githubUsername)", {
             userId,
@@ -248,7 +247,9 @@ export class StudentRecord implements StudentEntity {
             teamProjectDegree: lineValue[4],
             githubUsername: null
           });
-          newStudentsData.push(line);
+
+          await sendMail('headhunter@testHeadHunter.oi','Informacja o dodaniu do bazy kursantów MegaK','Informujemy o dodaniu Cię do listy kursantów. W ciągu 48 godzin należy zalogować się do systemu, zmienić hasło i uzupełnić dane.', `
+        <p>Link do logowania: <a href="http://localhost:5173/log/${newToken}">http://localhost:5173/log/${newToken}</a></p>`)
         }
       }
     } catch (e) {
