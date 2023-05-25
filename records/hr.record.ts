@@ -1,6 +1,6 @@
-import {HrEntity} from "../types";
-import {ValidationError} from "../utils/errors";
-import { pool } from "../config/db";
+import { HrEntity } from '../types';
+import { ValidationError } from '../utils/errors';
+import { pool } from '../config/db';
 
 export class HrRecord implements HrEntity {
     hrId: string;
@@ -11,13 +11,13 @@ export class HrRecord implements HrEntity {
     constructor(obj: HrEntity) {
     
         if (!obj.fullName) {
-            throw new ValidationError("HR musi posiadać imię i nazwisko");
+            throw new ValidationError('HR musi posiadać imię i nazwisko');
         }
         if (!obj.company) {
-            throw new ValidationError("Firma HR musi być podana");
+            throw new ValidationError('Firma HR musi być podana');
         }
         if (obj.maxReservedStudents < 1 || obj.maxReservedStudents > 999) {
-            throw new ValidationError("HR musi mieć ustalony limit w zakresie 1-999");
+            throw new ValidationError('HR musi mieć ustalony limit w zakresie 1-999');
         }
 
         this.hrId = obj.hrId;
@@ -27,7 +27,7 @@ export class HrRecord implements HrEntity {
     }
 
     async insert():Promise<void>{
-        await pool.execute("INSERT INTO `hrs`(`hrId`, `fullName`, `company`, `maxReservedStudents`) VALUES (:hrId, :fullName, :company, :maxReservedStudents)", this);
+        await pool.execute('INSERT INTO `hrs`(`hrId`, `fullName`, `company`, `maxReservedStudents`) VALUES (:hrId, :fullName, :company, :maxReservedStudents)', this);
 
     }
 
