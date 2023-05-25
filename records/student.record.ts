@@ -4,6 +4,10 @@ import {Octokit} from "@octokit/core";
 import {pool} from "../config/db";
 import { StudentEntity } from "../types";
 import { sendMail } from "../utils/sendMail";
+import { open } from "fs/promises";
+import { unlink } from 'node:fs';
+import {UserRecord} from "./user.record";
+import { v4 as uuid } from 'uuid';
 
 const checkGitHub = async (userName: string): Promise<string | null> => {
   try {
@@ -60,7 +64,7 @@ export class StudentRecord implements StudentEntity {
 
     if(!obj.studentId){
 
-      if (checkGithubUsername(this.githubUsername) !== null) {
+      if ((checkGithubUsername(this.githubUsername) !== null)&&(this.githubUsername!=="")) {
         throw new ValidationError("Taki użytkownik GitHuba już istnieje");
       }
     }
@@ -211,5 +215,50 @@ export class StudentRecord implements StudentEntity {
   async update(): Promise<string> {
     await pool.execute("UPDATE `students` SET `firstName` = :firstName, `lastName` = :lastName, `phoneNumber` = :phoneNumber, `githubUsername` = :githubUsername, `portfolioUrls` = :portfolioUrls, `projectUrls` = :projectUrls, `bio` = :bio, `expectedTypeWork` = :expectedTypeWork, `targetWorkCity` = :targetWorkCity, `expectedContractType` = :expectedContractType, `expectedSalary` = :expectedSalary, `canTakeApprenticeship` = :canTakeApprenticeship, `monthsOfCommercialExp` = :monthsOfCommercialExp, `education` = :education, `workExperience` = :workExperience, `courses` = :courses, `bonusProjectUrls` = :bonusProjectUrls WHERE `studentId` = :studentId", this);
     return this.studentId;
+  }
+
+  static async addNewStudent(fileName: string): Promise<void> {
+    const FILE_NAME = `./utils/download/${fileName}`;
+    let file;
+    try {
+      file = await open(FILE_NAME);
+      for await (const line of file.readLines()) {
+        const lineValue = line.split(',');
+        const emailThisLine = lineValue[0];
+        const bonusProjectUrls = parseInt(lineValue[1]);
+        const courseCompletion = parseInt(lineValue[2]);
+        const courseEngagement = parseInt(lineValue[3]);
+        const projectDegree = parseInt(lineValue[4]);
+        const validation = (emailThisLine.includes('@'))&&(bonusProjectUrls>0)&&(bonusProjectUrls<6)&&(courseCompletion>0)&&(courseCompletion<6)&&(courseEngagement>0)&&(courseEngagement<6)&&(projectDegree>0)&&(projectDegree<6);
+        if ((await UserRecord.checkEmail(emailThisLine)===null)&&validation){
+          const userId = uuid();
+          await pool.execute("INSERT INTO `users`(`email`, `userId`) VALUES (:email, :userId)", {
+            email: emailThisLine,
+            userId
+          });
+          const newToken: string = await UserRecord.addToken(userId);
+
+          await pool.execute("INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `githubUsername`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree, :githubUsername)", {
+            userId,
+            bonusProjectUrls,
+            courseCompletion,
+            courseEngagement,
+            projectDegree,
+            teamProjectDegree: lineValue[4],
+            githubUsername: null
+          });
+
+          await sendMail('headhunter@testHeadHunter.oi','Informacja o dodaniu do bazy kursantów MegaK','Informujemy o dodaniu Cię do listy kursantów. W ciągu 48 godzin należy zalogować się do systemu, zmienić hasło i uzupełnić dane.', `
+        <p>Link do logowania: <a href="http://localhost:5173/log/${newToken}">http://localhost:5173/log/${newToken}</a></p>`)
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await file?.close();
+      unlink(FILE_NAME, (err) => {
+        if (err) throw err;
+      });
+    }
   }
 }
