@@ -12,21 +12,23 @@ userRouter
     .post('/login', async (req: Request, res: Response) => {
         const params = { ...req.body } as UserEntity;
         const newParams = new UserRecord(params);
-        if (await newParams.checkPassword()) {
+        const response = await newParams.checkPassword();
+        const { id, state } = response;
+        if (id) {
             console.log('Dane logowania są prawidłowe');
-            const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
-            res.json({ token });
+            res.json({ id, state });
+            // const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
+            // res.json({ token });
         } else {
             throw new ValidationError('Błędne hasło')
         }
 
     })
-    .post("/refresh", async (req, res) => {
+    .post('/refresh', async (req, res) => {
         // refresh jwt
     })
 
-    
-    .delete("/logout", async (req, res) => {
+    .delete('/logout', async (req, res) => {
         // czyszczenie tokenów i wylogowanie
     })
 
@@ -37,30 +39,30 @@ userRouter
     })
 
     .post('/about-me', async (req, res) => {
-        const userId = req.body
+        const { userId } = req.body
 
         // przyjmuje formularz dodania/edycji danych i na jego podstawie wprowadza
         // zmiany w bazie
     })
 
     .post('/my-status', async (req, res) => {
-        const {studentId, userStatus} = req.body;
+        const { studentId, userStatus } = req.body;
         await UserRecord.updateStudentStatus(studentId, userStatus);
         res.json(true);
         // przyjmuje dane o statusie (zatrudniony lub nie)  i  wprowadza zmiany w bazie
     })
 
-    .get("/token/:token", async (req: Request, res: Response) => {
+    .get('/token/:token', async (req: Request, res: Response) => {
         const userId: string | null = await UserRecord.checkToken(req.params.token);
         res.json(userId);
     })
 
-    .get("/getemail/:id", async (req: Request, res: Response) => {
+    .get('/getemail/:id', async (req: Request, res: Response) => {
         const userEmail: string = await UserRecord.getEmail(req.params.id);
         res.json(userEmail);
     })
 
-    .get("/email/:email", async (req: Request, res: Response) => {
+    .get('/email/:email', async (req: Request, res: Response) => {
         const userId: string | null = await UserRecord.checkEmail(req.params.email);
         if (userId === null) {
             throw new ValidationError('Nie ma takiego adresu e-mail');
@@ -85,12 +87,12 @@ userRouter
         res.json(true);
     })
 
-    .patch("/changemail", async (req: Request, res: Response) => {
-        const {id, email} = req.body;
+    .patch('/changemail', async (req: Request, res: Response) => {
+        const { id, email } = req.body;
         const isEmail = await UserRecord.checkEmail(email);
 
         if(isEmail!==null){
-            throw new ValidationError("Taki e-mail już istnieje w systemie")
+            throw new ValidationError('Taki e-mail już istnieje w systemie')
         }
 
         if (!email.includes('@')) {
@@ -99,4 +101,3 @@ userRouter
         await UserRecord.updateEmail(id, email);
         res.json(true);
     });
-
