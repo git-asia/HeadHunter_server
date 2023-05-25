@@ -39,7 +39,7 @@ userRouter
     })
 
     .post('/about-me', async (req, res) => {
-        const { userId } = req.body
+        const userId = req.body
 
         // przyjmuje formularz dodania/edycji danych i na jego podstawie wprowadza
         // zmiany w bazie

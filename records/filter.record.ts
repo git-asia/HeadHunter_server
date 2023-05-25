@@ -1,10 +1,9 @@
-import { pool } from "../config/db";
-import { AvailableStudent, FilterEntity } from "../types";
-import { FieldPacket } from "mysql2";
-
+import { pool } from '../config/db';
+import { AvailableStudent, FilterEntity } from '../types';
+import { FieldPacket } from 'mysql2';
 
 type AvailableStudentResults = [AvailableStudent[], FieldPacket[]];
-type AllRecordsStudentResults = [{totalCount:number}[],FieldPacket[]];
+type AllRecordsStudentResults = [{ totalCount:number }[],FieldPacket[]];
 
 export class FilterRecord implements FilterEntity{
     remoteWork: boolean|string;
@@ -47,29 +46,29 @@ export class FilterRecord implements FilterEntity{
     }
 
     change(){
-        let query = "";
+        let query = '';
         if(this.remoteWork === 'true' || this.inOffice === 'true'){
-            query +=  "`expectedTypeWork` IN (:remoteWork, :inOffice)";
+            query +=  '`expectedTypeWork` IN (:remoteWork, :inOffice)';
         }
         if(this.employmentContract === true || this.b2b === true || this.mandateContract === true || this.workContract === true){
-            if(query !== ""){
-                query += " AND ";
+            if(query !== ''){
+                query += ' AND ';
             }
-            query += "`expectedContractType` IN (:employmentContract, :b2b,:mandateContract,:workContract)"
+            query += '`expectedContractType` IN (:employmentContract, :b2b,:mandateContract,:workContract)'
         }
         if(this.canTakeApprenticeship !== 'null'){
-            if(query !== ""){
-                query += " AND ";
+            if(query !== ''){
+                query += ' AND ';
             }
-            query += "`canTakeApprenticeship` = :canTakeApprenticeship"
+            query += '`canTakeApprenticeship` = :canTakeApprenticeship'
         }
-        if(query !== ""){
-            query += " AND ";
+        if(query !== ''){
+            query += ' AND ';
         }
         this.remoteWork = this.remoteWork === 'true' ? '2' : '9';
         this.inOffice = this.inOffice === 'true' ? '1' : '9';
         this.employmentContract = this.employmentContract === 'true' ? '1' : '9';
-        this.b2b = this.b2b === `true` ? '2' : '9';
+        this.b2b = this.b2b === 'true' ? '2' : '9';
         this.mandateContract = this.mandateContract === 'true' ? '3' : '9';
         this.workContract = this.workContract === 'true' ? '4' : '9';
         this.page = Number(this.page);
@@ -80,46 +79,41 @@ export class FilterRecord implements FilterEntity{
 
     async get():Promise<AvailableStudent[] | null>{
         const query = this.change();
-        const [results] = await pool.execute("SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`  FROM `students` WHERE " +
+        const [results] = await pool.execute('SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`  FROM `students` WHERE ' +
           query +
-          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
         return results.length === 0 ? null : results;
     }
 
     async allRecordsStudent():Promise<number>| null{
         const query = this.change();
-        const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE " +
+        const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE ' +
           query +
-          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2'"  , this) as AllRecordsStudentResults;
         return results.length === 0 ? null : results[0].totalCount
     }
 
     async getReserved():Promise<AvailableStudent[] | null>{
         const query = this.change();
-        const [results] = await pool.execute("SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`, `githubUsername`, `reservationExpiresOn`  FROM `students` WHERE " +
+        const [results] = await pool.execute('SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`, `githubUsername`, `reservationExpiresOn`  FROM `students` WHERE ' +
           query +
-          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
 
         return results.length === 0 ? null : results;
     }
     async allRecordsReservedStudent():Promise<number>| null{
         const query = this.change();
-        const [results] = await pool.execute("SELECT COUNT(*) AS `totalCount` FROM `students` WHERE " +
+        const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount` FROM `students` WHERE ' +
           query +
-          "`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp " +
+          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
           "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AllRecordsStudentResults;
 
         return results.length === 0 ? null : results[0].totalCount
     }
 }
-
-
-
-
-
 
 // console.log(
 //   'remoteWork:', this.remoteWork,
