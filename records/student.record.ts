@@ -2,7 +2,7 @@ import { FieldPacket } from 'mysql2';
 import { ValidationError } from '../utils/errors';
 import { Octokit } from '@octokit/core';
 import { pool } from '../config/db';
-import { StudentEntity } from '../types';
+import { StudentEntity, UpdateAction } from '../types';
 import { sendMail } from '../utils/sendMail';
 import { open } from 'fs/promises';
 import { unlink } from 'node:fs';
@@ -31,6 +31,7 @@ const checkGithubUsername = async (ghUserName: string): Promise<string | null> =
 }
 
 type StudentRecordResult = [StudentEntity[], FieldPacket[]];
+type StatusResult = [string[], FieldPacket[]];
 
 export class StudentRecord implements StudentEntity {
 
@@ -163,30 +164,30 @@ export class StudentRecord implements StudentEntity {
       return results;
   }
 
-  static async statusChange(action:'reserve'| 'employ' | 'disinterest',studentId:string, hrId:string|null):Promise<string> {
+  static async statusChange(action:UpdateAction, studentId:string, hrId:string):Promise<string> {
 
       //active - 1
       // reserved - 2
       // hired - 3
+
       let userStatus=0;
       let reservationExpiresOn:null|Date;
       let message='';
-      if (action === 'reserve') {
-          const [results] = await pool.execute('SELECT * FROM `students` WHERE `studentId`=:studentId AND `userStatus`=2',{ studentId } );
-          if(results) throw new ValidationError('Student został już zarezerwowany');
-          console.log(results);
+      if (action === UpdateAction.reserve) {
+          const [results] = await pool.execute('SELECT `studentId` FROM `students` WHERE `studentId`=:studentId AND `userStatus`= 2',{ studentId } ) as unknown as StatusResult;
+          if(results.length !==0) throw new ValidationError('Student został już zarezerwowany');
           const now = new Date();
           reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
-          userStatus = 2;
+          userStatus = UpdateAction.reserve;
           message= 'Kursant został zarezerwowany';
-      } else if (action === 'employ') {
+      } else if (action === UpdateAction.employ) {
           reservationExpiresOn = null;
-          userStatus = 3;
+          userStatus = UpdateAction.employ;
           message= 'Kursant został zatrudniony';
           await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO do zastanowienia się jaki tekst ma być wysyłany
-      } else if (action === 'disinterest'){
+      } else if (action === UpdateAction.disinterest){
           reservationExpiresOn = null;
-          userStatus = 1;
+          userStatus = UpdateAction.disinterest;
           hrId=null;
           message= 'Zgłoszono brak zainteresowania kursantem'
       }

@@ -82,7 +82,7 @@ export class FilterRecord implements FilterEntity{
         const [results] = await pool.execute('SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`  FROM `students` WHERE ' +
           query +
           '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '1' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
         return results.length === 0 ? null : results;
     }
 
@@ -91,7 +91,7 @@ export class FilterRecord implements FilterEntity{
         const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE ' +
           query +
           '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '2'"  , this) as AllRecordsStudentResults;
+          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '1'"  , this) as AllRecordsStudentResults;
         return results.length === 0 ? null : results[0].totalCount
     }
 
