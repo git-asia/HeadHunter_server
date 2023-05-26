@@ -172,9 +172,8 @@ export class StudentRecord implements StudentEntity {
       let reservationExpiresOn:null|Date;
       let message='';
       if (action === 'reserve') {
-          const [results] = await pool.execute('SELECT * FROM `students` WHERE `studentId`=:studentId AND `userStatus`=2',{ studentId } );
-          if(results) throw new ValidationError('Student został już zarezerwowany');
-          console.log(results);
+          const [ results ] = await pool.execute('SELECT * FROM `students` WHERE `studentId`=:studentId AND `userStatus`=2',{ studentId } ) as StudentRecordResult;
+          if(results.length > 0) throw new ValidationError('Student został już zarezerwowany');
           const now = new Date();
           reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
           userStatus = 2;
