@@ -68,7 +68,12 @@ studentRouter
             be: 'is working 🥳',
         });
     })
-    .post('/newstudents', upload.single('dataFile'), async (req, res, next) => {
+    .post('/newstudents', upload.single('dataFile'), async (req, res) => {
         await StudentRecord.addNewStudent(req.file.filename);
         res.status(200).json({ success: true, message: 'Kursanci zostali dodani' });
+    })
+    .get('/name/:id', async (req, res) => {
+        const studentId = req.params.id;
+        const { firstName, lastName, githubUsername } = (await StudentRecord.getCvOneStudent(studentId))[0];
+        res.json({ firstName, lastName, githubUsername });
     })

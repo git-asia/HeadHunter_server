@@ -1,6 +1,9 @@
 import { HrEntity } from '../types';
 import { ValidationError } from '../utils/errors';
 import { pool } from '../config/db';
+import { FieldPacket } from 'mysql2';
+
+type HrResult = [HrEntity[], FieldPacket[]];
 
 export class HrRecord implements HrEntity {
     hrId: string;
@@ -29,6 +32,13 @@ export class HrRecord implements HrEntity {
     async insert():Promise<void>{
         await pool.execute('INSERT INTO `hrs`(`hrId`, `fullName`, `company`, `maxReservedStudents`) VALUES (:hrId, :fullName, :company, :maxReservedStudents)', this);
 
+    }
+
+    static async getName(id:string): Promise<HrEntity[]> {
+        const [results] = await pool.execute('SELECT `fullName` FROM `hrs` WHERE `hrId` = :id',{
+            id
+        }) as HrResult;
+        return results;
     }
 
 }
