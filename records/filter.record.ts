@@ -1,11 +1,11 @@
 import { pool } from '../config/db';
-import { AvailableStudent, FilterEntity } from '../types';
+import { AvailableStudent, FilterQuery } from '../types';
 import { FieldPacket } from 'mysql2';
 
 type AvailableStudentResults = [AvailableStudent[], FieldPacket[]];
 type AllRecordsStudentResults = [{ totalCount:number }[],FieldPacket[]];
 
-export class FilterRecord implements FilterEntity{
+export class FilterRecord implements FilterQuery{
     remoteWork: boolean|string;
     inOffice: boolean|string;
     employmentContract: boolean|string;
@@ -24,7 +24,7 @@ export class FilterRecord implements FilterEntity{
     rowsPerPage : string|number;
     hrId?: string;
 
-    constructor(obj:FilterEntity) {
+    constructor(obj:FilterQuery) {
         //@TODO można dodać walidacje danych
         this.remoteWork = obj.remoteWork;
         this.inOffice = obj.inOffice;
