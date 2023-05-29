@@ -117,7 +117,7 @@ export class StudentRecord implements StudentEntity {
       if (obj.expectedContractType < 1 || obj.expectedContractType > 4){
           throw new ValidationError('Typ kontraktu musi być w zakresie 1-4')
       }
-      console.log(obj.portfolioUrls);
+    
       obj.portfolioUrls.split(' ').forEach(el => {
           if ((!/^(ftp|http|https):\/\/[^ "]+$/.test(el)&&(el!==''))) {
               throw new ValidationError('To nie jest link do portfolio')
@@ -252,6 +252,7 @@ export class StudentRecord implements StudentEntity {
           }
       } catch (e) {
           console.log(e);
+          throw new ValidationError('Nie udało się dodać kursantów');
       } finally {
           await file?.close();
           unlink(FILE_NAME, (err) => {
