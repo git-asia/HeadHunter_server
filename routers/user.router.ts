@@ -10,13 +10,11 @@ export const userRouter = Router();
 userRouter
 
     .post('/login', async (req: Request, res: Response) => {
-        const params = { ...req.body } as UserEntity;
-        const newParams = new UserRecord(params);
-        const response = await newParams.checkPassword();
-        const { id, state } = response;
-        if (id) {
+        const params = new UserRecord(req.body);
+        const response = await params.checkPassword();
+        if (response.id) {
             console.log('Dane logowania są prawidłowe');
-            res.json({ id, state });
+            res.json(response);
             // const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
             // res.json({ token });
         } else {
