@@ -1,4 +1,4 @@
-export interface FilterEntity {
+export interface FilterQuery {
   remoteWork: boolean|string,
   inOffice: boolean|string,
   employmentContract: boolean|string,
