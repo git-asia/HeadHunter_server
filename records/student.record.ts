@@ -66,6 +66,7 @@ export class StudentRecord implements StudentEntity {
       if(!obj.studentId){
 
           if ((checkGithubUsername(this.githubUsername) !== null)&&(this.githubUsername!=='')) {
+            
               throw new ValidationError('Taki użytkownik GitHuba już istnieje');
           }
       }

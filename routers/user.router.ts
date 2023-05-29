@@ -12,10 +12,13 @@ userRouter
     .post('/login', async (req: Request, res: Response) => {
         const params = { ...req.body } as UserEntity;
         const newParams = new UserRecord(params);
-        if (await newParams.checkPassword()) {
+        const response = await newParams.checkPassword();
+        const { id, state } = response;
+        if (id) {
             console.log('Dane logowania są prawidłowe');
-            const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
-            res.json({ token });
+            res.json({ id, state });
+            // const token = jwt.sign({ email: newParams.email }, /* @todo SET SECRET KEY process.env.secret_key*/'SEKRET', { expiresIn: '24h' });
+            // res.json({ token });
         } else {
             throw new ValidationError('Błędne hasło')
         }
@@ -24,7 +27,7 @@ userRouter
     .post('/refresh', async (req, res) => {
         // refresh jwt
     })
-    
+
     .delete('/logout', async (req, res) => {
         // czyszczenie tokenów i wylogowanie
     })

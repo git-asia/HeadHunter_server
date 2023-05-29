@@ -67,10 +67,16 @@ export class UserRecord implements  UserEntity {
         if (this.checkPasswordStrength()) {
             const user: UserEntity | null = await UserRecord.getOne(this.email);
             if (user === null) {
-                throw new ValidationError('Podany został nie prawidłowy adres e-mail')
+                throw new ValidationError('Podany został nie prawidłowy adres e-mail');
             }
             try {
-                return await bcrypt.compare(this.password, user.password);
+                if (await bcrypt.compare(this.password, user.password)){
+                    const idAndStatus = {
+                        id: user.userId,
+                        state: user.userState
+                    }
+                    return idAndStatus;
+                }
             } catch (err) {
                 console.error(err.message);
                 throw new ValidationError('Wystąpił błąd przy próbie logowania');
