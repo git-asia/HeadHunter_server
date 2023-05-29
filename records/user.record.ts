@@ -66,6 +66,7 @@ export class UserRecord implements  UserEntity {
     async checkPassword() {
         if (this.checkPasswordStrength()) {
             const user: UserEntity | null = await UserRecord.getOne(this.email);
+            console.log(user);
             if (user === null) {
                 throw new ValidationError('Podany został nie prawidłowy adres e-mail');
             }
@@ -76,6 +77,9 @@ export class UserRecord implements  UserEntity {
                         state: user.userState
                     }
                     return idAndStatus;
+                }
+                else{
+                    throw new ValidationError('Dane logowanie są niepoprawne.');
                 }
             } catch (err) {
                 console.error(err.message);
