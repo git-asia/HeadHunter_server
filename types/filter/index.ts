@@ -1,1 +1,1 @@
-export * from './filter.entity';
+export * from './FilterQuery';
