@@ -1,16 +1,22 @@
 export enum TypeWork {
   'Praca w biurze' = 1,
-  'Praca zdalna' = 2,
+  'Praca zdalna',
 }
 
 export enum ContractType {
   'Umowa o pracę' = 1,
-  'B2B' = 2,
-  'Umowa zlecenie' = 3,
-  'Umowa o dzieło' = 4,
+  'B2B',
+  'Umowa zlecenie',
+  'Umowa o dzieło',
 }
 
 export enum Internship {
-  'Nie',
-  'Tak',
+  Nie,
+  Tak,
+}
+
+export enum StudentStatus{
+  active=1,
+  reserved,
+  hired
 }
