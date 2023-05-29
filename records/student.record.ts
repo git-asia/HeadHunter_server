@@ -174,6 +174,7 @@ export class StudentRecord implements StudentEntity {
       let userStatus=0;
       let reservationExpiresOn:null|Date;
       let message='';
+
       if (action === UpdateAction.reserve) {
           const [results] = await pool.execute('SELECT `studentId` FROM `students` WHERE `studentId`=:studentId AND `userStatus`= 2',{ studentId } ) as unknown as StatusResult;
           if(results.length !==0) throw new ValidationError('Student został już zarezerwowany');

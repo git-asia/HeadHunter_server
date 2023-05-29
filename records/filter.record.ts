@@ -86,7 +86,7 @@ export class FilterRecord implements FilterQuery{
         return results.length === 0 ? null : results;
     }
 
-    async allRecordsStudent():Promise<number>| null{
+    async allRecordsStudent():Promise<number | null>{
         const query = this.change();
         const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE ' +
           query +
@@ -104,7 +104,7 @@ export class FilterRecord implements FilterQuery{
 
         return results.length === 0 ? null : results;
     }
-    async allRecordsReservedStudent():Promise<number>| null{
+    async allRecordsReservedStudent():Promise<number | null>{
         const query = this.change();
         const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount` FROM `students` WHERE ' +
           query +
