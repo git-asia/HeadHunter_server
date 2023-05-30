@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { StudentRecord } from '../records/student.record';
-import { FilterRecord } from '../records/filter.record';
-import { UpdateStatus } from '../types';
+import { StudentFilter } from '../records/student.filter';
+import { FilterQuery, UpdateStatus } from '../types';
 import multer from 'multer';
 
 const upload = multer({ dest: './utils/download/' })
@@ -12,7 +12,7 @@ studentRouter
 
     .get('/all/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage', async (req, res) => {
         const filter = req.params;
-        const availableStudents = new FilterRecord(filter);
+        const availableStudents = new StudentFilter(filter);
         const data = await availableStudents.get();
         const allRecords = await availableStudents.allRecordsStudent();
         const newData = {
@@ -22,11 +22,25 @@ studentRouter
 
         res.json(newData);
     })
-    .get('/reserved/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage/:hrId', async (req, res) => {
-        const filter = req.params;
-        const availableStudents = new FilterRecord(filter);
-        const data = await availableStudents.getReserved();
-        const allRecords = await availableStudents.allRecordsReservedStudent();
+    // .get('/reserved/:remoteWork/:inOffice/:employmentContract/:mandateContract/:b2b/:workContract/:min/:max/:courseCompletion/:courseEngagement/:projectDegree/:teamProjectDegree/:canTakeApprenticeship/:monthsOfCommercialExp/:page/:rowsPerPage/:hrId', async (req, res) => {
+    //     const filter = req.params;
+    //     const availableStudents = new StudentFilter(filter);
+    //     const data = await availableStudents.getReserved();
+    //     const allRecords = await availableStudents.allRecordsReservedStudent();
+    //     const newData = {
+    //         allRecords: allRecords,
+    //         data: data,
+    //     }
+    //     console.log(newData);
+    //     res.json(newData);
+    // })
+    .get('/reserved/',async (req,res)=>{
+        console.log(req.query);
+        const query= req.query as undefined as FilterQuery; //@TODO This is a strange solution, but I haven't found another way to make types work.
+        const filter = new StudentFilter(query);
+        console.log(filter);
+        const data = await filter.getReserved();
+        const allRecords = await filter.allRecordsReservedStudent();
         const newData = {
             allRecords: allRecords,
             data: data,
