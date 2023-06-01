@@ -5,7 +5,7 @@ import { FieldPacket } from 'mysql2';
 type AvailableStudentResults = [AvailableStudent[], FieldPacket[]];
 type AllRecordsStudentResults = [{ totalCount:number }[],FieldPacket[]];
 
-export class FilterRecord implements FilterQuery{
+export class StudentFilter implements FilterQuery{
     remoteWork: boolean|string;
     inOffice: boolean|string;
     employmentContract: boolean|string;
@@ -25,7 +25,7 @@ export class FilterRecord implements FilterQuery{
     hrId?: string;
 
     constructor(obj:FilterQuery) {
-        //@TODO można dodać walidacje danych
+        //@TODO data validation can be added
         this.remoteWork = obj.remoteWork;
         this.inOffice = obj.inOffice;
         this.employmentContract = obj.employmentContract;
