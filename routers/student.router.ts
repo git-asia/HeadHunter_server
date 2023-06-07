@@ -30,10 +30,12 @@ studentRouter
         console.log(availableStudents);
         const data = await availableStudents.getReserved();
         const allRecords = await availableStudents.allRecordsReservedStudent();
+        console.log({ allRecords });
         const newData = {
-            allRecords: allRecords,
-            data: data,
+            allRecords,
+            data,
         }
+
         res.json(newData);
     })
 
@@ -76,6 +78,6 @@ studentRouter
     })
     .get('/name/:id', async (req, res) => {
         const studentId = req.params.id;
-        const { firstName, lastName, githubUsername } = (await StudentRecord.getCvOneStudent(studentId))[0];
+        const { firstName, lastName, githubUsername } = (await StudentRecord.getCvOneStudent(studentId));
         res.json({ firstName, lastName, githubUsername });
     })

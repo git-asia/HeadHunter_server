@@ -1,4 +1,3 @@
-import { FieldPacket } from 'mysql2';
 import { ValidationError } from '../utils/errors';
 import { Octokit } from '@octokit/core';
 import { pool } from '../config/db';
@@ -23,15 +22,14 @@ const checkGitHub = async (userName: string): Promise<string | null> => {
     }
 }
 
-const checkGithubUsername = async (ghUserName: string): Promise<string | null> => {
-    const [results] = (await pool.execute('SELECT `studentId` FROM `students` WHERE `githubUsername` = :ghUsername', {
-        ghUserName,
-    })) as StudentRecordResult;
-    return results.length === 0 ? null : results[0].studentId;
-}
+const checkGithubUsername = async (githubUsername: string): Promise<string | null> => {
+    const results = await pool('students')
+        .select('studentId')
+        .where({ githubUsername })
+        .first() as { studentId : string };
 
-type StudentRecordResult = [StudentEntity[], FieldPacket[]];
-type StatusResult = [string[], FieldPacket[]];
+    return results === null ? null : results.studentId;
+}
 
 export class StudentRecord implements StudentEntity {
 
@@ -158,10 +156,31 @@ export class StudentRecord implements StudentEntity {
       this.reservationExpiresOn = obj.reservationExpiresOn;
   }
 
-  static async getCvOneStudentEdit(id:string): Promise<StudentEntity[]> {
-      const [results] = await pool.execute('SELECT `firstName`, `lastName`, `githubUsername`, `phoneNumber`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship`, `monthsOfCommercialExp`, `bio`, `education`, `courses`, `workExperience`, `portfolioUrls`, `bonusProjectUrls`, `projectUrls` FROM `students` WHERE `studentId` = :id',{
-          id
-      }) as StudentRecordResult;
+  static async getCvOneStudentEdit(studentId:string): Promise<StudentEntity> {
+
+      const results = await pool('students')
+          .select(
+              'firstName',
+              'lastName',
+              'githubUsername',
+              'phoneNumber',
+              'expectedTypeWork',
+              'targetWorkCity',
+              'expectedContractType',
+              'expectedSalary',
+              'canTakeApprenticeship',
+              'monthsOfCommercialExp',
+              'bio',
+              'education',
+              'courses',
+              'workExperience',
+              'portfolioUrls',
+              'bonusProjectUrls',
+              'projectUrls'
+          )
+          .where({ studentId })
+          .first();
+
       return results;
   }
 
@@ -176,8 +195,14 @@ export class StudentRecord implements StudentEntity {
       let message='';
 
       if (action === UpdateAction.reserve) {
-          const [results] = await pool.execute('SELECT `studentId` FROM `students` WHERE `studentId`=:studentId AND `userStatus`= 2',{ studentId } ) as unknown as StatusResult;
-          if(results.length !==0) throw new ValidationError('Student został już zarezerwowany');
+          const results = await pool('students')
+              .select('studentId')
+              .where('studentId', studentId)
+              .where('userStatus', 2)
+              .first() as string;
+
+          // const [results] = await pool.execute('SELECT `studentId` FROM `students` WHERE `studentId`=:studentId AND `userStatus`= 2',{ studentId } ) as unknown as StatusResult;
+          if(results === null) throw new ValidationError('Student został już zarezerwowany');
           const now = new Date();
           reservationExpiresOn = new Date(now.getTime() + 10 * 24 * 60 * 60 * 1000);
           userStatus = UpdateAction.reserve;
@@ -186,7 +211,7 @@ export class StudentRecord implements StudentEntity {
           reservationExpiresOn = null;
           userStatus = UpdateAction.employ;
           message= 'Kursant został zatrudniony';
-          await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO do zastanowienia się jaki tekst ma być wysyłany
+          await sendMail('headhunter@testHeadHunter.oi','student o id:'+studentId+' został zatrudniony','student o id:'+studentId+' został zatrudniony') //@TODO to consider what text should be sent
       } else if (action === UpdateAction.disinterest){
           reservationExpiresOn = null;
           userStatus = UpdateAction.disinterest;
@@ -197,7 +222,14 @@ export class StudentRecord implements StudentEntity {
           throw new ValidationError('Nie udało się wykonać zmiany statusu');
       }
 
-      const [results] = await pool.execute('UPDATE `students` SET `reservedBy` = :hrId, `userStatus` = :userStatus, `reservationExpiresOn` = :reservationExpiresOn  WHERE `studentId` = :studentId',{ hrId, userStatus, reservationExpiresOn, studentId })
+      const results = await pool('students')
+          .where({ studentId })
+          .update({
+              reservedBy: hrId,
+              userStatus,
+              reservationExpiresOn,
+          });
+
       if (results) {
           return message;
       } else {
@@ -205,15 +237,62 @@ export class StudentRecord implements StudentEntity {
       }
   }
 
-  static async getCvOneStudent(id:string): Promise<StudentEntity[]> {
-      const [results] = await pool.execute('SELECT `firstName`, `lastName`, `githubUsername`, `phoneNumber`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship`, `monthsOfCommercialExp`, `bio`, `education`, `courses`, `workExperience`, `portfolioUrls`, `bonusProjectUrls`, `projectUrls`, `userStatus`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree` FROM `students` WHERE `studentId` = :id',{
-          id
-      }) as StudentRecordResult;
+  static async getCvOneStudent(studentId:string): Promise<StudentEntity> {
+
+      const results = await pool('students')
+          .select(
+              'firstName',
+              'lastName',
+              'githubUsername',
+              'phoneNumber',
+              'expectedTypeWork',
+              'targetWorkCity',
+              'expectedContractType',
+              'expectedSalary',
+              'canTakeApprenticeship',
+              'monthsOfCommercialExp',
+              'bio',
+              'education',
+              'courses',
+              'workExperience',
+              'portfolioUrls',
+              'bonusProjectUrls',
+              'projectUrls',
+              'userStatus',
+              'courseCompletion',
+              'courseEngagement',
+              'projectDegree',
+              'teamProjectDegree'
+          )
+          .where({ studentId })
+          .first() as StudentEntity;
+      console.log(results);
       return results;
   }
 
   async update(): Promise<string> {
-      await pool.execute('UPDATE `students` SET `firstName` = :firstName, `lastName` = :lastName, `phoneNumber` = :phoneNumber, `githubUsername` = :githubUsername, `portfolioUrls` = :portfolioUrls, `projectUrls` = :projectUrls, `bio` = :bio, `expectedTypeWork` = :expectedTypeWork, `targetWorkCity` = :targetWorkCity, `expectedContractType` = :expectedContractType, `expectedSalary` = :expectedSalary, `canTakeApprenticeship` = :canTakeApprenticeship, `monthsOfCommercialExp` = :monthsOfCommercialExp, `education` = :education, `workExperience` = :workExperience, `courses` = :courses, `bonusProjectUrls` = :bonusProjectUrls WHERE `studentId` = :studentId', this);
+      await pool('students')
+          .where('studentId', this.studentId)
+          .update({
+              firstName: this.firstName,
+              lastName: this.lastName,
+              phoneNumber: this.phoneNumber,
+              githubUsername: this.githubUsername,
+              portfolioUrls: this.portfolioUrls,
+              projectUrls: this.projectUrls,
+              bio: this.bio,
+              expectedTypeWork: this.expectedTypeWork,
+              targetWorkCity: this.targetWorkCity,
+              expectedContractType: this.expectedContractType,
+              expectedSalary: this.expectedSalary,
+              canTakeApprenticeship: this.canTakeApprenticeship,
+              monthsOfCommercialExp: this.monthsOfCommercialExp,
+              education: this.education,
+              workExperience: this.workExperience,
+              courses: this.courses,
+              bonusProjectUrls: this.bonusProjectUrls,
+          });
+      
       return this.studentId;
   }
 
@@ -224,32 +303,35 @@ export class StudentRecord implements StudentEntity {
           file = await open(FILE_NAME);
           for await (const line of file.readLines()) {
               const lineValue = line.split(',');
-              const emailThisLine = lineValue[0];
+              const email = lineValue[0];
               const bonusProjectUrls = parseInt(lineValue[1]);
               const courseCompletion = parseInt(lineValue[2]);
               const courseEngagement = parseInt(lineValue[3]);
               const projectDegree = parseInt(lineValue[4]);
-              const validation = (emailThisLine.includes('@'))&&(bonusProjectUrls>0)&&(bonusProjectUrls<6)&&(courseCompletion>0)&&(courseCompletion<6)&&(courseEngagement>0)&&(courseEngagement<6)&&(projectDegree>0)&&(projectDegree<6);
-              if ((await UserRecord.checkEmail(emailThisLine)===null)&&validation){
+              const validation = (email.includes('@'))&&(bonusProjectUrls>0)&&(bonusProjectUrls<6)&&(courseCompletion>0)&&(courseCompletion<6)&&(courseEngagement>0)&&(courseEngagement<6)&&(projectDegree>0)&&(projectDegree<6);
+              if ((await UserRecord.checkEmail(email)===null)&&validation){
                   const userId = uuid();
-                  await pool.execute('INSERT INTO `users`(`email`, `userId`) VALUES (:email, :userId)', {
-                      email: emailThisLine,
-                      userId
-                  });
+                  await pool('users')
+                      .insert({
+                          email,
+                          userId
+                      });
+
                   const newToken: string = await UserRecord.addToken(userId);
 
-                  await pool.execute('INSERT INTO `students`(`studentId`, `bonusProjectUrls`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `githubUsername`) VALUES (:userId, :bonusProjectUrls, :courseCompletion, :courseEngagement, :projectDegree, :teamProjectDegree, :githubUsername)', {
-                      userId,
-                      bonusProjectUrls,
-                      courseCompletion,
-                      courseEngagement,
-                      projectDegree,
-                      teamProjectDegree: lineValue[4],
-                      githubUsername: null
-                  });
+                  await pool('students')
+                      .insert({
+                          studentId: userId,
+                          bonusProjectUrls,
+                          courseCompletion,
+                          courseEngagement,
+                          projectDegree,
+                          teamProjectDegree: lineValue[4], //@TODO dlaczego do teamProjekt jest przypisana wartość projectDegree przed parseInt
+                          githubUsername: null,
+                      });
 
                   await sendMail('headhunter@testHeadHunter.oi','Informacja o dodaniu do bazy kursantów MegaK','Informujemy o dodaniu Cię do listy kursantów. W ciągu 48 godzin należy zalogować się do systemu, zmienić hasło i uzupełnić dane.', `
-        <p>Link do logowania: <a href="http://localhost:5173/log/${newToken}">http://localhost:5173/log/${newToken}</a></p>`)
+        <p>Link do logowania: <a href="http://localhost:5173/log/${newToken}">http://localhost:5173/log/${newToken}</a></p>`) //@TODO change of website address
               }
           }
       } catch (e) {

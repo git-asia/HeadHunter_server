@@ -3,7 +3,6 @@ import { UserRecord } from '../records/user.record';
 import { ValidationError } from '../utils/errors';
 import { hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { UserEntity } from '../types';
 
 export const userRouter = Router();
 
@@ -30,19 +29,6 @@ userRouter
         // czyszczenie tokenów i wylogowanie
     })
 
-    .get('/about-me', async (req, res) => {
-        // id użytkownika przekazane w tokenie wymaga id użytkownika i zwraca wszystkie
-        // dane wymagane do wyświetlenia danych kursanta do edycji ich pobiera status
-        // kursanta i ewentualnych rezerwacjach od hr-u (nie jest wymagane)
-    })
-
-    .post('/about-me', async (req, res) => {
-        const userId = req.body
-
-        // przyjmuje formularz dodania/edycji danych i na jego podstawie wprowadza
-        // zmiany w bazie
-    })
-
     .post('/my-status', async (req, res) => {
         const { studentId, userStatus } = req.body;
         await UserRecord.updateStudentStatus(studentId, userStatus);
@@ -56,7 +42,7 @@ userRouter
     })
 
     .get('/getemail/:id', async (req: Request, res: Response) => {
-        const userEmail: string = await UserRecord.getEmail(req.params.id);
+        const userEmail: any = await UserRecord.getEmail(req.params.id);
         res.json(userEmail);
     })
 

@@ -1,9 +1,5 @@
 import { pool } from '../config/db';
 import { AvailableStudent, FilterQuery } from '../types';
-import { FieldPacket } from 'mysql2';
-
-type AvailableStudentResults = [AvailableStudent[], FieldPacket[]];
-type AllRecordsStudentResults = [{ totalCount:number }[],FieldPacket[]];
 
 export class StudentFilter implements FilterQuery{
     remoteWork: boolean|string;
@@ -79,39 +75,107 @@ export class StudentFilter implements FilterQuery{
 
     async get():Promise<AvailableStudent[] | null>{
         const query = this.change();
-        const [results] = await pool.execute('SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`  FROM `students` WHERE ' +
-          query +
-          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '1' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
+        const results = await pool('students')
+            .select(
+                'studentId',
+                'firstName',
+                'lastName',
+                'courseCompletion',
+                'courseEngagement',
+                'projectDegree',
+                'teamProjectDegree',
+                'expectedTypeWork',
+                'targetWorkCity',
+                'expectedContractType',
+                'expectedSalary',
+                'canTakeApprenticeship',
+                'monthsOfCommercialExp'
+            )
+            .whereRaw(query)
+            .where('expectedSalary', '>=', this.min)
+            .where('expectedSalary', '<=', this.max)
+            .where('monthsOfCommercialExp', '>=', this.monthsOfCommercialExp)
+            .where('courseCompletion', '>=', this.courseCompletion)
+            .where('courseEngagement', '>=', this.courseEngagement)
+            .where('projectDegree', '>=', this.projectDegree)
+            .where('teamProjectDegree', '>=', this.teamProjectDegree)
+            .where('userStatus', '1')
+            .limit(Number(this.rowsPerPage))
+            .offset(Number(this.page)) as AvailableStudent[];
+        
         return results.length === 0 ? null : results;
     }
 
-    async allRecordsStudent():Promise<number | null>{
+    async allRecordsStudent():Promise<any>{
         const query = this.change();
-        const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount`  FROM `students` WHERE ' +
-          query +
-          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree AND `userStatus`= '1'"  , this) as AllRecordsStudentResults;
-        return results.length === 0 ? null : results[0].totalCount
+        const results = await pool('students')
+            .count('* as totalCount')
+            .whereRaw(query)
+            .where('expectedSalary', '>=', this.min)
+            .where('expectedSalary', '<=', this.max)
+            .where('monthsOfCommercialExp', '>=', this.monthsOfCommercialExp)
+            .where('courseCompletion', '>=', this.courseCompletion)
+            .where('courseEngagement', '>=', this.courseEngagement)
+            .where('projectDegree', '>=', this.projectDegree)
+            .where('teamProjectDegree', '>=', this.teamProjectDegree)
+            .where('userStatus', '1')
+            .first() as { totalCount:number };
+
+        return results.totalCount;
     }
 
     async getReserved():Promise<AvailableStudent[] | null>{
         const query = this.change();
-        const [results] = await pool.execute('SELECT `studentId`, `firstName`,`lastName`, `courseCompletion`, `courseEngagement`, `projectDegree`, `teamProjectDegree`, `expectedTypeWork`, `targetWorkCity`, `expectedContractType`, `expectedSalary`, `canTakeApprenticeship` ,`monthsOfCommercialExp`, `githubUsername`, `reservationExpiresOn`  FROM `students` WHERE ' +
-          query +
-          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AvailableStudentResults;
+        const results = await pool('students')
+            .select(
+                'studentId',
+                'firstName',
+                'lastName',
+                'courseCompletion',
+                'courseEngagement',
+                'projectDegree',
+                'teamProjectDegree',
+                'expectedTypeWork',
+                'targetWorkCity',
+                'expectedContractType',
+                'expectedSalary',
+                'canTakeApprenticeship',
+                'monthsOfCommercialExp',
+                'githubUsername',
+                'reservationExpiresOn'
+            )
+            .whereRaw(query)
+            .where('expectedSalary', '>=', this.min)
+            .where('expectedSalary', '<=', this.max)
+            .where('monthsOfCommercialExp', '>=', this.monthsOfCommercialExp)
+            .where('courseCompletion', '>=', this.courseCompletion)
+            .where('courseEngagement', '>=', this.courseEngagement)
+            .where('projectDegree', '>=', this.projectDegree)
+            .where('teamProjectDegree', '>=', this.teamProjectDegree)
+            .where('reservedBy', this.hrId)
+            .where('userStatus', '2')
+            .limit(Number(this.rowsPerPage))
+            .offset(Number(this.page)) as AvailableStudent[];
 
         return results.length === 0 ? null : results;
     }
-    async allRecordsReservedStudent():Promise<number | null>{
+    async allRecordsReservedStudent():Promise<any>{
         const query = this.change();
-        const [results] = await pool.execute('SELECT COUNT(*) AS `totalCount` FROM `students` WHERE ' +
-          query +
-          '`expectedSalary` BETWEEN :min AND :max AND `monthsOfCommercialExp` >= :monthsOfCommercialExp ' +
-          "AND `courseCompletion` >= :courseCompletion AND `courseEngagement` >= :courseEngagement AND `projectDegree` >= :projectDegree AND `teamProjectDegree` >= :teamProjectDegree  AND `reservedBy` = :hrId AND `userStatus`= '2' LIMIT :rowsPerPage OFFSET :page" , this) as AllRecordsStudentResults;
+        const results = await pool('students')
+            .count('* as totalCount')
+            .whereRaw(query)
+            .where('expectedSalary', '>=', this.min)
+            .where('expectedSalary', '<=', this.max)
+            .where('monthsOfCommercialExp', '>=', this.monthsOfCommercialExp)
+            .where('courseCompletion', '>=', this.courseCompletion)
+            .where('courseEngagement', '>=', this.courseEngagement)
+            .where('projectDegree', '>=', this.projectDegree)
+            .where('teamProjectDegree', '>=', this.teamProjectDegree)
+            .where('reservedBy', this.hrId)
+            .where('userStatus', '2')
+            .first() as { totalCount:number };
 
-        return results.length === 0 ? null : results[0].totalCount
+        return Number(results.totalCount);
     }
 }
 

@@ -1,12 +1,8 @@
 import { ValidationError } from '../utils/errors';
 import { RegistrationTokenEntity, UserEntity } from '../types';
-import { FieldPacket } from 'mysql2';
 import { pool } from '../config/db';
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
-
-type UserRecordResult = [UserRecord[], FieldPacket[]];
-type RegistrationTokenResult = [RegistrationTokenEntity[], FieldPacket[]];
 
 export class UserRecord implements  UserEntity {
 
@@ -35,7 +31,17 @@ export class UserRecord implements  UserEntity {
         this.authToken = null;
         this.userState = 0;
 
-        await pool.execute('INSERT INTO `users`(`userId`, `email`, `password`, `authToken`, `userState`) VALUES (:userId, :email, :password, :authToken, :userState)', this);
+        await pool('users').insert({
+            userId: this.userId,
+            email: this.email,
+            password: this.password,
+            authToken: this.authToken,
+            userState: this.userState
+        }).then(() => {
+            console.log('Użytkownik został dodany');
+        }).catch(() => {
+            throw new ValidationError('Dodanie użytkownika zakończone niepowodzeniem.')
+        });
     }
 
     async hashPassword(password: string, salt: string): Promise<string> {
@@ -57,26 +63,29 @@ export class UserRecord implements  UserEntity {
         return passwordRegex.test(this.password);
     }
 
-    static async getOne(email: string): Promise<UserEntity | null> {
-        const [results] = await pool.execute('SELECT * FROM `users` WHERE `email`=:email', { email }) as UserRecordResult;
-        return results.length === 0 ? null : new UserRecord(results[0] as UserEntity)
+    static async getOne(email: string):Promise<UserRecord | null> {
+
+        const results = await pool('users')
+            .select('*')
+            .where('email', email)
+            .first() as UserEntity;
+        return results ? new UserRecord(results) : null;
 
     }
 
     async checkPassword() {
         if (this.checkPasswordStrength()) {
-            const user: UserEntity | null = await UserRecord.getOne(this.email);
-            console.log(user);
+            const user: UserRecord | null = await UserRecord.getOne(this.email);
             if (user === null) {
                 throw new ValidationError('Podany został nie prawidłowy adres e-mail');
             }
             try {
                 if (await bcrypt.compare(this.password, user.password)){
-                    const idAndStatus = {
+                    return {
                         id: user.userId,
                         state: user.userState
                     }
-                    return idAndStatus;
+
                 }
                 else{
                     throw new ValidationError('Dane logowanie są niepoprawne.');
@@ -91,72 +100,109 @@ export class UserRecord implements  UserEntity {
     }
 
     static async checkToken(token: string): Promise<string | null> {
-        const [results] = (await pool.execute('SELECT * FROM `registration_tokens` WHERE `registrationToken` = :token', {
-            token,
-        })) as RegistrationTokenResult;
-        if (results.length === 0) {
+
+        const results = await pool('registration_tokens')
+            .select('*')
+            .where('registrationToken',token)
+            .first() as RegistrationTokenEntity
+
+        if (results === null) {
             return('Błąd: brak tokena!');
         }
-        return (results[0].tokenExpiresOn).getTime() < Date.now() ? null : results[0].userId;
+        return (results.tokenExpiresOn).getTime() < Date.now() ? null : results.userId;
     }
 
     static async checkEmail(email: string): Promise<string | null> {
-        const [results] = (await pool.execute('SELECT `userId` FROM `users` WHERE `email` = :email', {
-            email,
-        })) as UserRecordResult;
-        return results.length === 0 ? null : results[0].userId;
+
+        const results = await pool('users')
+            .select('userId')
+            .where('email',email)
+            .first() as { userId:string }
+
+        return results === null ? null : results.userId;
     }
 
     static async addToken(id: string): Promise<string> {
         let newToken, isThisToken;
         do {
             newToken = uuid();
-            const [results] = await pool.execute('SELECT `userId` FROM `registration_tokens` WHERE `registrationToken` = :token', {
-                token: newToken,
-            }) as UserRecordResult;
+            const results = await  pool('registration_tokens')
+                .select('userId')
+                .where('registrationToken',newToken) as UserRecord[];
+            // const [results] = await pool.execute('SELECT `userId` FROM `registration_tokens` WHERE `registrationToken` = :token', {
+            //     token: newToken,
+            // }) as UserRecordResult;
             isThisToken = results.length;
         } while (isThisToken > 0)
-        const [results] = (await pool.execute('SELECT `userId` FROM `registration_tokens` WHERE `userId` = :userId', {
-            userId: id,
-        })) as RegistrationTokenResult;
+        const results = await pool('registration_tokens')
+            .select('userId')
+            .where('userId',id) as RegistrationTokenEntity[];
+        // const [results] = (await pool.execute('SELECT `userId` FROM `registration_tokens` WHERE `userId` = :userId', {
+        //     userId: id,
+        //  })) as RegistrationTokenResult;
         if (results.length > 0) {
-            await pool.execute('DELETE FROM `registration_tokens` WHERE `userId` = :userId', {
-                userId: id,
-            });
+            await pool('registration_tokens')
+                .where('userId', id)
+                .del();
+            // await pool.execute('DELETE FROM `registration_tokens` WHERE `userId` = :userId', {
+            //     userId: id,
+            // });
         }
-        await pool.execute('INSERT INTO `registration_tokens` (`userId`, `registrationToken`, `tokenExpiresOn`) VALUES (:userId, :token, ADDDATE(NOW(), INTERVAL 1 DAY))', {
-            userId: id,
-            token: newToken,
-        });
+        await pool('registration_tokens')
+            .insert({
+                userId: id,
+                registrationToken: newToken,
+                tokenExpiresOn: pool.raw('ADDDATE(NOW(), INTERVAL 1 DAY)'),
+            })
+        // await pool.execute('INSERT INTO `registration_tokens` (`userId`, `registrationToken`, `tokenExpiresOn`) VALUES (:userId, :token, ADDDATE(NOW(), INTERVAL 1 DAY))', {
+        //     userId: id,
+        //     token: newToken,
+        // });
         return newToken;
     }
 
     static async updatePassword(id: string, hashPassword: string): Promise<void> {
-        await pool.execute('UPDATE `users` SET `password` = :hashPassword WHERE `userId` = :id', {
-            hashPassword,
-            id,
-        });
-        await pool.execute('DELETE FROM `registration_tokens` WHERE `userId` = :id', {
-            id,
-        });
+        await pool('users')
+            .where('userId', id)
+            .update({ password: hashPassword });
+
+        await pool('registration_tokens')
+            .where('userId',id)
+            .del();
+        // await pool.execute('DELETE FROM `registration_tokens` WHERE `userId` = :id', {
+        //     id,
+        // });
     }
 
     static async updateEmail(id: string, email: string): Promise<void> {
-        await pool.execute('UPDATE `users` SET `email` = :email WHERE `userId` = :id', {
-            email,
-            id,
-        });
+        await pool('user')
+            .where('userId',id)
+            .update({ email });
+        // await pool.execute('UPDATE `users` SET `email` = :email WHERE `userId` = :id', {
+        //     email,
+        //     id,
+        // });
     }
 
     static async updateStudentStatus(studentId: string, userStatus: number): Promise<void> {
-        await pool.execute('UPDATE `students` SET `userStatus` = :userStatus WHERE `studentId` = :studentId', {
-            studentId,
-            userStatus,
-        });
+
+        await pool('students')
+            .where({ studentId })
+            .update({ userStatus })
+        // await pool.execute('UPDATE `students` SET `userStatus` = :userStatus WHERE `studentId` = :studentId', {
+        //     studentId,
+        //     userStatus,
+        // });
     }
 
-    static async getEmail(id: string): Promise<string> {
-        const [results] = await pool.execute('SELECT `email` FROM `users` WHERE `userId`=:id', { id }) as UserRecordResult;
-        return results[0].email;
+    static async getEmail(userId: string): Promise<string> {
+        const results = await  pool('users')
+            .select('email')
+            .where({ userId })
+            .first() as { email: string };
+        // const [results] = await pool.execute('SELECT `email` FROM `users` WHERE `userId`=:id', { id }) as UserRecordResult;
+
+        return results === null ? null : results.email;
+
     }
 }

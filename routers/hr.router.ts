@@ -7,7 +7,7 @@ hrRouter
 
     .get('/name/:id', async (req, res) => {
         const hrId = req.params.id;
-        const { fullName } = (await HrRecord.getName(hrId))[0];
+        const { fullName } = (await HrRecord.getName(hrId));
         console.log(fullName);
         res.json(fullName);
     })
